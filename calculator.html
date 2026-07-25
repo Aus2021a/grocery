@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Load & Team Calculator</title>
+
+  <style>
+    :root { --primary: #005a36; --bg: #f8fafc; --card: #ffffff; --text: #0f172a; --border: #e2e8f0; --danger: #ef4444; }
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { margin: 0; padding: 16px; background: var(--bg); color: var(--text); padding-bottom: 80px; }
+    header { background: var(--primary); color: #fff; padding: 16px; margin: -16px -16px 16px -16px; border-radius: 0 0 16px 16px; }
+    h1 { margin: 0; font-size: 18px; }
+    .card { background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 14px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat { background: #f1f5f9; padding: 10px; border-radius: 8px; text-align: center; }
+    .val { font-size: 18px; font-weight: 700; color: var(--primary); }
+    .form-g { margin-bottom: 10px; }
+    label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+    input, select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-size: 14px; }
+    .btn { width: 100%; padding: 12px; border-radius: 8px; border: none; background: var(--primary); color: #fff; font-weight: 600; margin-top: 8px; }
+    .team-row { display: flex; gap: 10px; margin-bottom: 10px; }
+    .team-row input { flex: 1; }
+  </style>
+</head>
+
+<body>
+
+<header><h1>Load & Team Calculator</h1></header>
+
+<!-- Stats -->
+<div class="card">
+  <div class="grid">
+    <div class="stat"><div>Cartons</div><div class="val" id="tc">0</div></div>
+    <div class="stat"><div>Req Hrs</div><div class="val" id="tr">0.0</div></div>
+    <div class="stat"><div>Team Hrs</div><div class="val" id="tm">0.0</div></div>
+    <div class="stat"><div>Variance</div><div class="val" id="vr">0.0</div></div>
+  </div>
+</div>
+
+<!-- Carton Inputs -->
+<div class="card">
+  <h3>Cartons</h3>
+  <div id="cartonInputs"></div>
+</div>
+
+<!-- Team Inputs -->
+<div class="card">
+  <h3>Team Members</h3>
+  <div id="team"></div>
+  <button class="btn" onclick="addTeam()">Add Team Member</button>
+</div>
+
+<!-- Rate Editor -->
+<div class="card">
+  <h3>Adjust Carton Rates</h3>
+  <div id="rc"></div>
+  <button class="btn" onclick="sr()">Save Rates</button>
+</div>
+
+<!-- Export -->
+<div class="card">
+  <button class="btn" onclick="exportCSV()">Export Results</button>
+</div>
+
+<script>
+  /* -------------------------
+     Load Rates
+  ------------------------- */
+  let r = JSON.parse(localStorage.getItem('cr')) || {
+    "AM Ambient":45, "PM Grocery":45, "Chilled":50, "Freezer":35, "Bulk":60
+  };
+
+  const deps = ["AM Ambient","PM Grocery","Chilled","Freezer","Bulk"];
+
+  /* -------------------------
+     Build Rate Editor
+  ------------------------- */
+  function rr(){
+    let h = '';
+    for(let k in r){
+      h += `<div class="form-g"><label>${k}</label>
+              <input type="number" value="${r[k]}" id="r_${k}">
+            </div>`;
+    }
+    document.getElementById('rc').innerHTML = h;
+  }
+  rr();
+
+  function sr(){
+    for(let k in r){
+      let v = parseFloat(document.getElementById('r_'+k).value);
+      if(v) r[k] = v;
+    }
+    localStorage.setItem('cr', JSON.stringify(r));
+    alert('Rates Saved!');
+    calc();
+  }
+
+  /* -------------------------
+     Carton Inputs
+  ------------------------- */
+  function buildCartonInputs(){
+    let h = '';
+    deps.forEach(d=>{
+      h += `<div class="form-g">
+              <label>${d}</label>
+              <input type="number" id="c_${d}" value="0" oninput="calc()">
+            </div>`;
+    });
+    document.getElementById('cartonInputs').innerHTML = h;
+  }
+  buildCartonInputs();
+
+  /* -------------------------
+     Team Inputs
+  ------------------------- */
+  function addTeam(){
+    let id = Date.now();
+    let row = `
+      <div class="team-row" id="t_${id}">
+        <input type="text" placeholder="Name">
+        <input type="number" placeholder="Hours" oninput="calc()">
+        <button onclick="removeTeam(${id})">X</button>
+      </div>`;
+    document.getElementById('team').insertAdjacentHTML('beforeend', row);
+  }
+
+  function removeTeam(id){
+    document.getElementById('t_'+id).remove();
+    calc();
+  }
+
+  /* -------------------------
+     Main Calculation
+  ------------------------- */
+  function calc(){
+    let totalCartons = 0;
+    let reqHours = 0;
+
+    deps.forEach(d=>{
+      let cartons = parseFloat(document.getElementById('c_'+d).value) || 0;
+      totalCartons += cartons;
+      reqHours += cartons / r[d];
+    });
+
+    let teamHours = 0;
+    document.querySelectorAll('#team .team-row input[type="number"]').forEach(i=>{
+      teamHours += parseFloat(i.value) || 0;
+    });
+
+    let variance = teamHours - reqHours;
+
+    document.getElementById('tc').innerText = totalCartons;
+    document.getElementById('tr').innerText = reqHours.toFixed(1);
+    document.getElementById('tm').innerText = teamHours.toFixed(1);
+    document.getElementById('vr').innerText = variance.toFixed(1);
+  }
+
+  /* -------------------------
+     Export CSV
+  ------------------------- */
+  function exportCSV() {
+    let rows = [];
+
+    rows.push(["Load & Team Calculator Export"]);
+    rows.push(["Generated", new Date().toLocaleString()]);
+    rows.push([]);
+
+    rows.push(["Stats"]);
+    rows.push(["Total Cartons", document.getElementById("tc").innerText]);
+    rows.push(["Required Hours", document.getElementById("tr").innerText]);
+    rows.push(["Team Hours", document.getElementById("tm").innerText]);
+    rows.push(["Variance", document.getElementById("vr").innerText]);
+    rows.push([]);
+
+    rows.push(["Cartons"]);
+    deps.forEach(d => {
+      let cartons = document.getElementById("c_" + d).value || 0;
+      rows.push([d, cartons]);
+    });
+    rows.push([]);
+
+    rows.push(["Rates"]);
+    for (let k in r) rows.push([k, r[k]]);
+    rows.push([]);
+
+    rows.push(["Team Members"]);
+    document.querySelectorAll("#team .team-row").forEach(row => {
+      let name = row.querySelector('input[type="text"]').value || "";
+      let hrs = row.querySelector('input[type="number"]').value || 0;
+      rows.push([name, hrs]);
+    });
+
+    let csv = rows.map(r => r.join(",")).join("\n");
+
+    let blob = new Blob([csv], { type: "text/csv" });
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement("a");
+    a.href = url;
+    a.download = "load_team_export.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+</script>
+
+</body>
+</html>
