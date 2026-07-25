@@ -126,7 +126,6 @@
     cursor: pointer;
   }
 
-  /* Team member row styling */
   .team-row {
     display: flex;
     gap: 8px;
@@ -152,7 +151,6 @@
     font-weight: 600;
   }
 
-  /* Bottom Navigation */
   .nav {
     position: fixed;
     bottom: 0;
@@ -251,14 +249,10 @@
 </div>
 
 <script>
-/* Helper to safely format DOM element IDs */
 function cleanId(name) {
   return name.replace(/[^a-zA-Z0-9]/g, '_');
 }
 
-/* -------------------------
-   Tab Navigation
-------------------------- */
 function showTab(tab) {
   document.querySelectorAll('.tab').forEach(t => t.style.display = 'none');
   document.getElementById(tab).style.display = 'block';
@@ -267,15 +261,11 @@ function showTab(tab) {
   document.getElementById('nav-' + tab).classList.add('active');
 }
 
-/* -------------------------
-   Load Categories & Rates
-------------------------- */
 const loadCategories = {
   "AM Loads": ["Heathwood Chilled", "Heathwood Meat"],
   "PM Loads": ["BRDC Milk", "BRDC Fresh", "BRDC Chilled"]
 };
 
-// Flatten list for quick iteration
 const deps = Object.values(loadCategories).flat();
 
 const defaultRates = {
@@ -286,16 +276,24 @@ const defaultRates = {
   "BRDC Chilled": 50
 };
 
-let r = JSON.parse(localStorage.getItem('cr')) || defaultRates;
+// Safely parse LocalStorage and reset if incompatible
+let r = {};
+try {
+  let saved = localStorage.getItem('cr');
+  if (saved) {
+    r = JSON.parse(saved);
+  }
+} catch (e) {
+  r = {};
+}
 
-// Ensure default rates exist if new departments were added
+// Fallback to defaults if saved rates are missing or corrupted
 deps.forEach(d => {
-  if (!r[d]) r[d] = defaultRates[d] || 45;
+  if (!r[d] || isNaN(r[d])) {
+    r[d] = defaultRates[d] || 45;
+  }
 });
 
-/* -------------------------
-   Build Rate Editor
-------------------------- */
 function rr(){
   let h = '';
   for (const [groupName, groupDeps] of Object.entries(loadCategories)) {
@@ -325,9 +323,6 @@ function sr(){
   calc();
 }
 
-/* -------------------------
-   Carton Inputs
-------------------------- */
 function buildCartonInputs(){
   let h = '';
   for (const [groupName, groupDeps] of Object.entries(loadCategories)) {
@@ -343,9 +338,6 @@ function buildCartonInputs(){
   document.getElementById('cartonInputs').innerHTML = h;
 }
 
-/* -------------------------
-   Team Inputs
-------------------------- */
 function addTeam(){
   let id = Date.now();
   let row = `
@@ -363,9 +355,6 @@ function removeTeam(id){
   calc();
 }
 
-/* -------------------------
-   Main Calculation
-------------------------- */
 function calc(){
   let totalCartons = 0;
   let reqHours = 0;
@@ -393,10 +382,12 @@ function calc(){
   document.getElementById('vr').innerText = variance.toFixed(1);
 }
 
-// Initial setup on load
-rr();
-buildCartonInputs();
-calc();
+// Safely execute setup after DOM renders
+window.addEventListener('DOMContentLoaded', () => {
+  rr();
+  buildCartonInputs();
+  calc();
+});
 </script>
 
 </body>
