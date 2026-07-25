@@ -46,21 +46,6 @@
     color: var(--text);
   }
 
-  .category-header {
-    font-size: 14px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--primary);
-    margin: 16px 0 8px 0;
-    padding-bottom: 4px;
-    border-bottom: 2px solid var(--primary);
-  }
-
-  .category-header:first-of-type {
-    margin-top: 0;
-  }
-
   .card {
     background: var(--card);
     border-radius: 14px;
@@ -70,32 +55,71 @@
     box-shadow: 0 1px 3px rgba(0,0,0,0.06);
   }
 
-  .summary-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-
-  .summary-item {
+  /* Split Summary Grid */
+  .summary-box {
     background: #f1f5f9;
     padding: 12px;
     border-radius: 10px;
+    margin-bottom: 12px;
+  }
+
+  .summary-box-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 4px;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
     text-align: center;
   }
 
   .summary-label {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--muted);
   }
 
   .summary-value {
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 700;
-    color: var(--primary);
+    color: var(--text);
   }
 
   .form-group {
     margin-bottom: 12px;
+  }
+
+  .load-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .load-row label {
+    flex: 2;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .load-row input {
+    flex: 1.5;
+  }
+
+  .load-row select {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    font-size: 13px;
+    background: #fff;
+    font-weight: 600;
   }
 
   label {
@@ -105,7 +129,7 @@
     display: block;
   }
 
-  input {
+  input, select {
     width: 100%;
     padding: 10px;
     border-radius: 10px;
@@ -126,19 +150,54 @@
     cursor: pointer;
   }
 
-  .team-row {
+  /* Team Row Styling for Start / Finish Times */
+  .team-card {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+
+  .team-header {
     display: flex;
     gap: 8px;
     margin-bottom: 8px;
+  }
+
+  .team-times {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.2fr;
+    gap: 6px;
     align-items: center;
   }
 
-  .team-row input[type="text"] {
-    flex: 2;
+  .team-times div {
+    text-align: center;
   }
 
-  .team-row input[type="number"] {
-    flex: 1;
+  .team-times label {
+    font-size: 10px;
+    color: var(--muted);
+    margin-bottom: 2px;
+  }
+
+  .team-times input {
+    padding: 6px;
+    font-size: 13px;
+    text-align: center;
+  }
+
+  .calculated-hours {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  .break-note {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 2px;
   }
 
   .btn-remove {
@@ -146,7 +205,7 @@
     color: #fff;
     border: none;
     border-radius: 8px;
-    padding: 10px;
+    padding: 8px 12px;
     cursor: pointer;
     font-weight: 600;
   }
@@ -188,36 +247,72 @@
 <!-- SUMMARY TAB -->
 <div id="summary" class="tab" style="display:block;">
   <div class="card">
-    <div class="section-title">Daily Summary</div>
+    <div class="section-title">Fill Window Breakdowns</div>
 
-    <div class="summary-grid">
-      <div class="summary-item">
-        <div class="summary-label">Total Cartons</div>
-        <div class="summary-value" id="tc">0</div>
-      </div>
-
-      <div class="summary-item">
-        <div class="summary-label">Required Hours</div>
-        <div class="summary-value" id="tr">0.0</div>
-      </div>
-
-      <div class="summary-item">
-        <div class="summary-label">Team Hours</div>
-        <div class="summary-value" id="tm">0.0</div>
-      </div>
-
-      <div class="summary-item">
-        <div class="summary-label">Variance</div>
-        <div class="summary-value" id="vr">0.0</div>
+    <!-- AM SUMMARY -->
+    <div class="summary-box">
+      <div class="summary-box-title">AM Window (05:00 - 13:00)</div>
+      <div class="summary-grid">
+        <div>
+          <div class="summary-label">Target Hrs</div>
+          <div class="summary-value" id="am_tr">0.0</div>
+        </div>
+        <div>
+          <div class="summary-label">Team Hrs</div>
+          <div class="summary-value" id="am_tm">0.0</div>
+        </div>
+        <div>
+          <div class="summary-label">Variance</div>
+          <div class="summary-value" id="am_vr">0.0</div>
+        </div>
       </div>
     </div>
+
+    <!-- PM SUMMARY -->
+    <div class="summary-box">
+      <div class="summary-box-title">PM Window (13:00 - 21:00)</div>
+      <div class="summary-grid">
+        <div>
+          <div class="summary-label">Target Hrs</div>
+          <div class="summary-value" id="pm_tr">0.0</div>
+        </div>
+        <div>
+          <div class="summary-label">Team Hrs</div>
+          <div class="summary-value" id="pm_tm">0.0</div>
+        </div>
+        <div>
+          <div class="summary-label">Variance</div>
+          <div class="summary-value" id="pm_vr">0.0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOTAL SUMMARY -->
+    <div class="summary-box" style="background: #e6f4ea; border: 1px solid var(--primary);">
+      <div class="summary-box-title" style="color: var(--primary);">Daily Total (Net Paid)</div>
+      <div class="summary-grid">
+        <div>
+          <div class="summary-label">Total Cartons</div>
+          <div class="summary-value" id="tc">0</div>
+        </div>
+        <div>
+          <div class="summary-label">Total Target</div>
+          <div class="summary-value" id="tr">0.0</div>
+        </div>
+        <div>
+          <div class="summary-label">Total Variance</div>
+          <div class="summary-value" id="vr">0.0</div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
 <!-- LOADS TAB -->
 <div id="loads" class="tab">
   <div class="card">
-    <div class="section-title">Carton Inputs</div>
+    <div class="section-title">Carton Inputs & Shift Assignment</div>
     <div id="cartonInputs"></div>
   </div>
 </div>
@@ -225,7 +320,7 @@
 <!-- TEAM TAB -->
 <div id="teamTab" class="tab">
   <div class="card">
-    <div class="section-title">Team Members</div>
+    <div class="section-title">Team Roster & Shifts</div>
     <div id="team"></div>
     <button type="button" class="btn" onclick="addTeam()">Add Team Member</button>
   </div>
@@ -234,9 +329,9 @@
 <!-- RATES TAB -->
 <div id="rates" class="tab">
   <div class="card">
-    <div class="section-title">Rate Settings</div>
+    <div class="section-title">Rate Settings (Cartons/Hr)</div>
     <div id="rc"></div>
-    <button type="button" class="btn" onclick="sr()">Save Rates</button>
+    <button type="button" class="btn" onclick="sr()">Save Settings</button>
   </div>
 </div>
 
@@ -261,12 +356,14 @@ function showTab(tab) {
   document.getElementById('nav-' + tab).classList.add('active');
 }
 
-const loadCategories = {
-  "AM Loads": ["Heathwood Chilled", "Heathwood Meat"],
-  "PM Loads": ["BRDC Milk", "BRDC Fresh", "BRDC Chilled"]
-};
-
-const deps = Object.values(loadCategories).flat();
+/* Load configuration and defaults */
+const loadsList = [
+  { name: "Heathwood Chilled", defaultGroup: "AM" },
+  { name: "Heathwood Meat", defaultGroup: "AM" },
+  { name: "BRDC Milk", defaultGroup: "PM" },
+  { name: "BRDC Fresh", defaultGroup: "PM" },
+  { name: "BRDC Chilled", defaultGroup: "PM" }
+];
 
 const defaultRates = {
   "Heathwood Chilled": 50,
@@ -276,77 +373,89 @@ const defaultRates = {
   "BRDC Chilled": 50
 };
 
-// Safely parse LocalStorage and reset if incompatible
+// Window definitions in hours
+const AM_WINDOW_START = 5;
+const AM_WINDOW_END = 13;
+const PM_WINDOW_START = 13;
+const PM_WINDOW_END = 21;
+
 let r = {};
 try {
   let saved = localStorage.getItem('cr');
-  if (saved) {
-    r = JSON.parse(saved);
-  }
-} catch (e) {
-  r = {};
-}
+  if (saved) r = JSON.parse(saved);
+} catch (e) { r = {}; }
 
-// Fallback to defaults if saved rates are missing or corrupted
-deps.forEach(d => {
-  if (!r[d] || isNaN(r[d])) {
-    r[d] = defaultRates[d] || 45;
-  }
+loadsList.forEach(l => {
+  if (!r[l.name] || isNaN(r[l.name])) r[l.name] = defaultRates[l.name] || 45;
 });
 
 function rr(){
   let h = '';
-  for (const [groupName, groupDeps] of Object.entries(loadCategories)) {
-    h += `<div class="category-header">${groupName}</div>`;
-    groupDeps.forEach(k => {
-      let safeId = cleanId(k);
-      h += `<div class="form-group">
-              <label>${k}</label>
-              <input type="number" value="${r[k]}" id="r_${safeId}">
-            </div>`;
-    });
-  }
+  loadsList.forEach(l => {
+    let safeId = cleanId(l.name);
+    h += `<div class="form-group">
+            <label>${l.name}</label>
+            <input type="number" value="${r[l.name]}" id="r_${safeId}">
+          </div>`;
+  });
   document.getElementById('rc').innerHTML = h;
 }
 
 function sr(){
-  deps.forEach(k => {
-    let safeId = cleanId(k);
+  loadsList.forEach(l => {
+    let safeId = cleanId(l.name);
     let el = document.getElementById('r_' + safeId);
     if (el) {
       let v = parseFloat(el.value);
-      if (!isNaN(v) && v > 0) r[k] = v;
+      if (!isNaN(v) && v > 0) r[l.name] = v;
     }
   });
   localStorage.setItem('cr', JSON.stringify(r));
-  alert('Rates Saved!');
+  alert('Settings Saved!');
   calc();
 }
 
 function buildCartonInputs(){
   let h = '';
-  for (const [groupName, groupDeps] of Object.entries(loadCategories)) {
-    h += `<div class="category-header">${groupName}</div>`;
-    groupDeps.forEach(d => {
-      let safeId = cleanId(d);
-      h += `<div class="form-group">
-              <label>${d}</label>
-              <input type="number" id="c_${safeId}" value="0" min="0" oninput="calc()">
-            </div>`;
-    });
-  }
+  loadsList.forEach(l => {
+    let safeId = cleanId(l.name);
+    h += `<div class="load-row">
+            <label>${l.name}</label>
+            <input type="number" id="c_${safeId}" value="0" min="0" placeholder="Cartons" oninput="calc()">
+            <select id="grp_${safeId}" onchange="calc()">
+              <option value="AM" ${l.defaultGroup === 'AM' ? 'selected' : ''}>AM</option>
+              <option value="PM" ${l.defaultGroup === 'PM' ? 'selected' : ''}>PM</option>
+            </select>
+          </div>`;
+  });
   document.getElementById('cartonInputs').innerHTML = h;
 }
 
 function addTeam(){
   let id = Date.now();
   let row = `
-    <div class="team-row" id="t_${id}">
-      <input type="text" placeholder="Name">
-      <input type="number" placeholder="Hours" min="0" step="0.5" oninput="calc()">
-      <button type="button" class="btn-remove" onclick="removeTeam(${id})">✕</button>
+    <div class="team-card" id="t_${id}">
+      <div class="team-header">
+        <input type="text" placeholder="Member Name" style="flex:1;">
+        <button type="button" class="btn-remove" onclick="removeTeam(${id})">✕</button>
+      </div>
+      <div class="team-times">
+        <div>
+          <label>Start Time</label>
+          <input type="time" class="t-start" value="06:00" onchange="calc()">
+        </div>
+        <div>
+          <label>Finish Time</label>
+          <input type="time" class="t-end" value="14:00" onchange="calc()">
+        </div>
+        <div>
+          <div class="calculated-hours"><span class="t-hrs">7.5</span>h</div>
+          <div class="break-note"><span class="t-break">-0.5h break</span></div>
+        </div>
+      </div>
     </div>`;
   document.getElementById('team').insertAdjacentHTML('beforeend', row);
+  calc();
 }
 
 function removeTeam(id){
@@ -355,34 +464,104 @@ function removeTeam(id){
   calc();
 }
 
-function calc(){
-  let totalCartons = 0;
-  let reqHours = 0;
-
-  deps.forEach(d => {
-    let safeId = cleanId(d);
-    let input = document.getElementById('c_' + safeId);
-    let cartons = input ? parseFloat(input.value) || 0 : 0;
-    let rate = r[d] || 45;
-
-    totalCartons += cartons;
-    reqHours += cartons / rate;
-  });
-
-  let teamHours = 0;
-  document.querySelectorAll('#team input[type="number"]').forEach(i => {
-    teamHours += parseFloat(i.value) || 0;
-  });
-
-  let variance = teamHours - reqHours;
-
-  document.getElementById('tc').innerText = totalCartons;
-  document.getElementById('tr').innerText = reqHours.toFixed(1);
-  document.getElementById('tm').innerText = teamHours.toFixed(1);
-  document.getElementById('vr').innerText = variance.toFixed(1);
+/* Calculate overlapping hours between shift interval and window interval */
+function getOverlapHours(shiftStart, shiftEnd, windowStart, windowEnd) {
+  let start = Math.max(shiftStart, windowStart);
+  let end = Math.min(shiftEnd, windowEnd);
+  return Math.max(0, end - start);
 }
 
-// Safely execute setup after DOM renders
+function calc(){
+  let totalCartons = 0;
+  let amReqHours = 0;
+  let pmReqHours = 0;
+
+  // 1. Calculate Load Targets per window
+  loadsList.forEach(l => {
+    let safeId = cleanId(l.name);
+    let cartonInput = document.getElementById('c_' + safeId);
+    let groupSelect = document.getElementById('grp_' + safeId);
+
+    let cartons = cartonInput ? parseFloat(cartonInput.value) || 0 : 0;
+    let group = groupSelect ? groupSelect.value : l.defaultGroup;
+    let rate = r[l.name] || 45;
+
+    totalCartons += cartons;
+    let reqHours = cartons / rate;
+
+    if (group === 'AM') {
+      amReqHours += reqHours;
+    } else {
+      pmReqHours += reqHours;
+    }
+  });
+
+  // 2. Calculate Team Hours per window based on start/finish times & Woolworths EA breaks
+  let amTeamHours = 0;
+  let pmTeamHours = 0;
+
+  document.querySelectorAll('.team-card').forEach(card => {
+    let startVal = card.querySelector('.t-start').value;
+    let endVal = card.querySelector('.t-end').value;
+
+    if (startVal && endVal) {
+      let [sH, sM] = startVal.split(':').map(Number);
+      let [eH, eM] = endVal.split(':').map(Number);
+
+      let shiftStart = sH + (sM / 60);
+      let shiftEnd = eH + (eM / 60);
+
+      // Support overnight or next-day shifts if finish < start
+      if (shiftEnd < shiftStart) shiftEnd += 24;
+
+      let grossShiftHours = shiftEnd - shiftStart;
+      
+      // Woolworths EA: 30-min (0.5h) unpaid break for shifts >= 5 hours
+      let unpaidBreak = (grossShiftHours >= 5.0) ? 0.5 : 0.0;
+      let netPaidHours = Math.max(0, grossShiftHours - unpaidBreak);
+
+      // Display net paid hours and break info
+      card.querySelector('.t-hrs').innerText = netPaidHours.toFixed(1);
+      card.querySelector('.t-break').innerText = unpaidBreak > 0 ? '-0.5h break' : 'no break';
+
+      // Calculate gross overlap per window
+      let amGrossOverlap = getOverlapHours(shiftStart, shiftEnd, AM_WINDOW_START, AM_WINDOW_END);
+      let pmGrossOverlap = getOverlapHours(shiftStart, shiftEnd, PM_WINDOW_START, PM_WINDOW_END);
+
+      // Deduct break proportionally across windows if shift spans both windows
+      if (grossShiftHours > 0) {
+        let amRatio = amGrossOverlap / grossShiftHours;
+        let pmRatio = pmGrossOverlap / grossShiftHours;
+
+        amTeamHours += Math.max(0, amGrossOverlap - (unpaidBreak * amRatio));
+        pmTeamHours += Math.max(0, pmGrossOverlap - (unpaidBreak * pmRatio));
+      }
+    }
+  });
+
+  // Variances
+  let amVariance = amTeamHours - amReqHours;
+  let pmVariance = pmTeamHours - pmReqHours;
+  let totalReq = amReqHours + pmReqHours;
+  let totalTeam = amTeamHours + pmTeamHours;
+  let totalVariance = totalTeam - totalReq;
+
+  // Update AM UI
+  document.getElementById('am_tr').innerText = amReqHours.toFixed(1);
+  document.getElementById('am_tm').innerText = amTeamHours.toFixed(1);
+  document.getElementById('am_vr').innerText = amVariance.toFixed(1);
+
+  // Update PM UI
+  document.getElementById('pm_tr').innerText = pmReqHours.toFixed(1);
+  document.getElementById('pm_tm').innerText = pmTeamHours.toFixed(1);
+  document.getElementById('pm_vr').innerText = pmVariance.toFixed(1);
+
+  // Update Total UI
+  document.getElementById('tc').innerText = totalCartons;
+  document.getElementById('tr').innerText = totalReq.toFixed(1);
+  document.getElementById('vr').innerText = totalVariance.toFixed(1);
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   rr();
   buildCartonInputs();
