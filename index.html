@@ -1,58 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Load & Team Calculator</title>
-  <style>
-    :root { --primary: #005a36; --bg: #f8fafc; --card: #ffffff; --text: #0f172a; --border: #e2e8f0; --danger: #ef4444; }
-    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { margin: 0; padding: 16px; background: var(--bg); color: var(--text); padding-bottom: 80px; }
-    header { background: var(--primary); color: #fff; padding: 16px; margin: -16px -16px 16px -16px; border-radius: 0 0 16px 16px; }
-    h1 { margin: 0; font-size: 18px; }
-    .card { background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 14px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .stat { background: #f1f5f9; padding: 10px; border-radius: 8px; text-align: center; }
-    .val { font-size: 18px; font-weight: 700; color: var(--primary); }
-    .form-g { margin-bottom: 10px; }
-    label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
-    input, select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-size: 14px; }
-    .btn { width: 100%; padding: 12px; border-radius: 8px; border: none; background: var(--primary); color: #fff; font-weight: 600; margin-top: 8px; }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Operations & Team Management Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
-  <header><h1>Load & Team Calculator</h1></header>
-  <div class="card">
-    <div class="grid">
-      <div class="stat"><div>Cartons</div><div class="val" id="tc">0</div></div>
-      <div class="stat"><div>Req Hrs</div><div class="val" id="tr">0.0</div></div>
-      <div class="stat"><div>Team Hrs</div><div class="val" id="tm">0.0</div></div>
-      <div class="stat"><div>Variance</div><div class="val" id="vr">0.0</div></div>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen p-4 sm:p-6">
+  <div class="max-w-4xl mx-auto space-y-6">
+    
+    <!-- Header -->
+    <header class="bg-slate-900 text-white p-6 rounded-xl shadow-md flex justify-between items-center">
+      <div>
+        <h1 class="text-2xl font-bold">Labor & Load Operations</h1>
+        <p class="text-slate-400 text-sm">Real-time team performance & schedule tracking</p>
+      </div>
+      <span class="bg-green-500/20 text-green-300 text-xs px-3 py-1 rounded-full font-semibold border border-green-500/30">Active</span>
+    </header>
+
+    <!-- Metrics Summary -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+        <p class="text-xs text-slate-500 uppercase font-semibold">Total Load (Cartons)</p>
+        <p class="text-3xl font-bold text-slate-900 mt-1" id="totalLoad">1,850</p>
+      </div>
+      <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+        <p class="text-xs text-slate-500 uppercase font-semibold">Rostered Hours</p>
+        <p class="text-3xl font-bold text-slate-900 mt-1" id="rosteredHours">38.5 hrs</p>
+      </div>
+      <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+        <p class="text-xs text-slate-500 uppercase font-semibold">Target Rate</p>
+        <p class="text-3xl font-bold text-emerald-600 mt-1" id="targetRate">52 CPH</p>
+      </div>
     </div>
+
+    <!-- Chart Section -->
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+      <h2 class="text-lg font-bold text-slate-800 mb-4">Required vs. Rostered Hours</h2>
+      <div class="relative h-64">
+        <canvas id="varianceChart"></canvas>
+      </div>
+    </div>
+
   </div>
-  <div class="card">
-    <h3>Adjust Carton Rates</h3>
-    <div id="rc"></div>
-    <button class="btn" onclick="sr()">Save Rates</button>
-  </div>
+
   <script>
-    let r = JSON.parse(localStorage.getItem('cr')) || {"AM Ambient":45, "PM Grocery":45, "Chilled":50, "Freezer":35, "Bulk":60};
-    function rr(){
-      let h = '';
-      for(let k in r) h += `<div class="form-g"><label>${k}</label><input type="number" value="${r[k]}" id="r_${k}"></div>`;
-      document.getElementById('rc').innerHTML = h;
-    }
-    function sr(){
-      for(let k in r){
-        let v = parseFloat(document.getElementById('r_'+k).value);
-        if(v) r[k] = v;
+    const ctx = document.getElementById('varianceChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [
+          { label: 'Required Hours', data: [32, 35, 40, 38, 42, 30, 28], backgroundColor: '#3b82f6' },
+          { label: 'Rostered Hours', data: [30, 36, 38, 40, 40, 32, 26], backgroundColor: '#10b981' }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' } }
       }
-      localStorage.setItem('cr', JSON.stringify(r));
-      alert('Rates Saved!');
-    }
-    rr();
+    });
   </script>
 </body>
 </html>
