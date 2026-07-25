@@ -4,92 +4,92 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Grocery Load Calculator</title>
-  <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-100 font-sans text-gray-800 pb-20 select-none">
+<body class="bg-[#f8fafc] font-sans text-gray-800 pb-24 select-none">
 
   <!-- Header Banner -->
-  <header class="bg-[#005228] text-white p-4 shadow-md">
-    <h1 class="text-xl font-bold">Load & Team Calculator</h1>
-    <p class="text-xs text-gray-200">Manage Load Sizes, Team Hours & Carton Rates</p>
+  <header class="bg-[#005228] text-white px-5 py-4 shadow-sm">
+    <h1 class="text-xl font-bold tracking-tight">Load & Team Calculator</h1>
+    <p class="text-xs text-emerald-100/80 font-medium mt-0.5">Manage Load Sizes, Team Hours & Carton Rates</p>
   </header>
 
   <main class="p-4 max-w-md mx-auto space-y-4">
     
-    <!-- PWA Helper Notice -->
-    <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-800 flex items-start gap-2">
-      <span class="text-base">💡</span>
-      <div>
-        <span class="font-semibold">Save to iOS Home Screen:</span> Tap the <span class="font-bold">Share</span> icon in Safari (<i class="fa-solid fa-arrow-up-from-bracket"></i>) and select <span class="font-bold">"Add to Home Screen"</span> to use as an app!
+    <!-- PWA Install Notice -->
+    <div class="bg-[#eff6ff] border border-[#dbeafe] rounded-xl p-3.5 text-xs text-[#1e40af] flex items-start gap-2.5 shadow-sm">
+      <span class="text-sm">💡</span>
+      <div class="leading-relaxed">
+        <span class="font-bold">Save to iOS Home Screen:</span> Tap the <span class="font-bold">Share</span> icon in Safari (<i class="fa-solid fa-arrow-up-from-bracket mx-0.5"></i>) and select <span class="font-bold">"Add to Home Screen"</span> to use as an app!
       </div>
     </div>
 
-    <!-- Daily Labor Summary Container -->
-    <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-200 space-y-3">
-      <h2 class="text-md font-bold text-gray-900">Daily Labor Summary</h2>
+    <!-- Daily Labor Summary -->
+    <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 space-y-3">
+      <h2 class="text-base font-bold text-gray-900">Daily Labor Summary</h2>
       
-      <!-- 2x2 Grid -->
+      <!-- 2x2 Metric Grid -->
       <div class="grid grid-cols-2 gap-3">
         
-        <!-- Metric 1 -->
-        <div class="bg-slate-50 border border-slate-100 rounded-lg p-3 text-center">
-          <p class="text-xs text-gray-500 font-medium">Total Cartons</p>
-          <p class="text-xl font-extrabold text-gray-900 mt-1">0</p>
+        <!-- Total Cartons -->
+        <div class="bg-[#f8fafc] rounded-xl p-3.5 text-center border border-gray-50">
+          <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Total Cartons</p>
+          <p class="text-2xl font-bold text-gray-900 mt-1">1,850</p>
         </div>
 
-        <!-- Metric 2 -->
-        <div class="bg-slate-50 border border-slate-100 rounded-lg p-3 text-center">
-          <p class="text-xs text-gray-500 font-medium">Required Hours</p>
-          <p class="text-xl font-extrabold text-[#005228] mt-1">0.0 hrs</p>
+        <!-- Required Hours -->
+        <div class="bg-[#f8fafc] rounded-xl p-3.5 text-center border border-gray-50">
+          <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Required Hours</p>
+          <p class="text-2xl font-bold text-[#005228] mt-1">35.6 hrs</p>
         </div>
 
-        <!-- Metric 3 -->
-        <div class="bg-slate-50 border border-slate-100 rounded-lg p-3 text-center">
-          <p class="text-xs text-gray-500 font-medium">Rostered Team Hrs</p>
-          <p class="text-xl font-extrabold text-[#005228] mt-1">0.0 hrs</p>
+        <!-- Rostered Team Hrs -->
+        <div class="bg-[#f8fafc] rounded-xl p-3.5 text-center border border-gray-50">
+          <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Rostered Team Hrs</p>
+          <p class="text-2xl font-bold text-[#005228] mt-1">38.5 hrs</p>
         </div>
 
-        <!-- Metric 4 -->
-        <div class="bg-slate-50 border border-slate-100 rounded-lg p-3 text-center">
-          <p class="text-xs text-gray-500 font-medium">Variance / Gap</p>
-          <p class="text-xl font-extrabold text-[#005228] mt-1">0.0 hrs</p>
+        <!-- Variance / Gap -->
+        <div class="bg-[#f8fafc] rounded-xl p-3.5 text-center border border-gray-50">
+          <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Variance / Gap</p>
+          <p class="text-2xl font-bold text-[#005228] mt-1">+2.9 hrs</p>
         </div>
 
       </div>
     </div>
 
-    <!-- Quick Load Breakdown Container -->
-    <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-200 min-h-[120px]">
-      <h2 class="text-md font-bold text-gray-900 mb-6">Quick Load Breakdown</h2>
-      <p class="text-center text-sm text-gray-400">No loads added yet.</p>
+    <!-- Quick Load Breakdown -->
+    <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 min-h-[140px] flex flex-col justify-between">
+      <h2 class="text-base font-bold text-gray-900">Quick Load Breakdown</h2>
+      <div class="py-6 text-center">
+        <p class="text-sm text-gray-400 font-medium">No loads added yet.</p>
+      </div>
     </div>
 
   </main>
 
   <!-- Bottom Navigation Bar -->
-  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around py-2 px-1 text-center shadow-lg">
+  <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200/80 flex justify-around py-2.5 px-2 text-center shadow-lg z-50">
     
     <button class="flex-1 flex flex-col items-center text-[#005228]">
       <i class="fa-solid fa-table-cells-large text-lg"></i>
-      <span class="text-[10px] font-bold mt-1">Summary</span>
+      <span class="text-[11px] font-semibold mt-1">Summary</span>
     </button>
 
-    <button class="flex-1 flex flex-col items-center text-gray-500 hover:text-gray-800">
+    <button class="flex-1 flex flex-col items-center text-gray-400 hover:text-gray-600">
       <i class="fa-solid fa-truck text-lg"></i>
-      <span class="text-[10px] font-medium mt-1">Load Sizes</span>
+      <span class="text-[11px] font-medium mt-1">Load Sizes</span>
     </button>
 
-    <button class="flex-1 flex flex-col items-center text-gray-500 hover:text-gray-800">
+    <button class="flex-1 flex flex-col items-center text-gray-400 hover:text-gray-600">
       <i class="fa-solid fa-users text-lg"></i>
-      <span class="text-[10px] font-medium mt-1">Team</span>
+      <span class="text-[11px] font-medium mt-1">Team</span>
     </button>
 
-    <button class="flex-1 flex flex-col items-center text-gray-500 hover:text-gray-800">
+    <button class="flex-1 flex flex-col items-center text-gray-400 hover:text-gray-600">
       <i class="fa-solid fa-gear text-lg"></i>
-      <span class="text-[10px] font-medium mt-1">Rates Settings</span>
+      <span class="text-[11px] font-medium mt-1">Rates Settings</span>
     </button>
 
   </nav>
