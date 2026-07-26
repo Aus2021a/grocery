@@ -495,14 +495,14 @@ const loadsList = [
 ];
 
 const dailyTasksList = [
-  { id: "Gap Scan", name: "Gap Scan", window: "AM", hours: 1.0 },
-  { id: "Dbl Beep", name: "Double Beep", window: "AM", hours: 0.5 },
-  { id: "LNO", name: "LNO", window: "AM", hours: 1.0 },
-  { id: "Huddle", name: "Daily Huddle", window: "AM", hours: 0.5 },
-  { id: "OOC", name: "Out Of Code", window: "PM", hours: 2.0 },
-  { id: "Rotation", name: "Rotation Check", window: "PM", hours: 3.0 },
-  { id: "Ready Fill", name: "Ready to Fill", window: "PM", hours: 0.5 },
-  { id: "Managers", name: "Managers Mtg", window: "PM", hours: 2.0 }
+  { id: "Gap Scan", name: "Gap Scan", window: "AM", hours: 1.0, isMorningCore: true },
+  { id: "Dbl Beep", name: "Double Beep", window: "AM", hours: 0.5, isMorningCore: true },
+  { id: "LNO", name: "LNO", window: "AM", hours: 1.0, isMorningCore: true },
+  { id: "Huddle", name: "Daily Huddle", window: "AM", hours: 0.5, isMorningCore: false },
+  { id: "OOC", name: "Out Of Code", window: "PM", hours: 2.0, isMorningCore: false },
+  { id: "Rotation", name: "Rotation Check", window: "PM", hours: 3.0, isMorningCore: false },
+  { id: "Ready Fill", name: "Ready to Fill", window: "PM", hours: 0.5, isMorningCore: false },
+  { id: "Managers", name: "Managers Mtg", window: "PM", hours: 2.0, isMorningCore: false }
 ];
 
 const defaultRates = {
@@ -638,19 +638,37 @@ function getOverlapHours(shiftStart, shiftEnd, windowStart, windowEnd) {
   return Math.max(0, end - start);
 }
 
-function calculateWindowFinish(windowStart, windowEnd, requiredHours, activeShifts) {
-  if (requiredHours <= 0 || activeShifts.length === 0) return "--:--";
+/* Completion logic that subtracts 07:00-09:00 core task commitments from load work availability */
+function calculateWindowFinish(windowStart, windowEnd, requiredHours, memberShifts) {
+  if (requiredHours <= 0 || memberShifts.length === 0) return "--:--";
 
-  activeShifts.sort((a, b) => a.start - b.start);
-
-  let currentTime = Math.max(windowStart, activeShifts[0].start);
+  let currentTime = windowStart;
   let remainingHours = requiredHours;
 
   while (remainingHours > 0 && currentTime < windowEnd + 12) {
-    let workingNow = activeShifts.filter(s => currentTime >= s.start && currentTime < s.end).length;
+    let activeWorkers = 0;
 
-    if (workingNow > 0) {
-      let minuteBurnRate = workingNow / 60;
+    memberShifts.forEach(shift => {
+      let isWorkingShift = (currentTime >= shift.start && currentTime < shift.end);
+      
+      // Lock out availability if assigned to 07:00-09:00 core tasks
+      let isLockedForTask = false;
+      if (shift.hasCoreTasks && currentTime >= 7.0 && currentTime < 9.0) {
+        // Calculate total hours of core tasks assigned
+        let coreTaskDuration = shift.coreTaskHours || 0;
+        let taskEndTime = 7.0 + coreTaskDuration;
+        if (currentTime < taskEndTime) {
+          isLockedForTask = true;
+        }
+      }
+
+      if (isWorkingShift && !isLockedForTask) {
+        activeWorkers++;
+      }
+    });
+
+    if (activeWorkers > 0) {
+      let minuteBurnRate = activeWorkers / 60;
       remainingHours -= minuteBurnRate;
     }
 
@@ -738,11 +756,30 @@ function calc(){
       card.querySelector('.t-hrs').innerText = netPaidHours.toFixed(1);
       card.querySelector('.t-break').innerText = unpaidBreak > 0 ? '-0.5h break' : 'no break';
 
+      // Check for assigned core tasks (07:00-09:00)
+      let coreTaskHours = 0;
+      let hasCoreTasks = false;
+      card.querySelectorAll('.task-assign:checked').forEach(cb => {
+        let taskId = cb.getAttribute('data-task');
+        let taskObj = dailyTasksList.find(t => t.id === taskId);
+        if (taskObj && taskObj.isMorningCore) {
+          hasCoreTasks = true;
+          coreTaskHours += taskObj.hours;
+        }
+      });
+
+      let shiftInfo = {
+        start: shiftStart,
+        end: shiftEnd,
+        hasCoreTasks: hasCoreTasks,
+        coreTaskHours: coreTaskHours
+      };
+
       let amGrossOverlap = getOverlapHours(shiftStart, shiftEnd, AM_WINDOW_START, AM_WINDOW_END);
       let pmGrossOverlap = getOverlapHours(shiftStart, shiftEnd, PM_WINDOW_START, PM_WINDOW_END);
 
-      if (amGrossOverlap > 0) amShifts.push({ start: shiftStart, end: shiftEnd });
-      if (pmGrossOverlap > 0) pmShifts.push({ start: shiftStart, end: shiftEnd });
+      if (amGrossOverlap > 0) amShifts.push(shiftInfo);
+      if (pmGrossOverlap > 0) pmShifts.push(shiftInfo);
 
       if (grossShiftHours > 0) {
         let amRatio = amGrossOverlap / grossShiftHours;
@@ -756,7 +793,7 @@ function calc(){
         let loadName = cb.getAttribute('data-load');
         if (loadStats[loadName]) {
           loadStats[loadName].assignedMembers.push(memberName);
-          loadStats[loadName].memberShifts.push({ start: shiftStart, end: shiftEnd });
+          loadStats[loadName].memberShifts.push(shiftInfo);
         }
       });
 
