@@ -16,6 +16,7 @@
     --border: #e2e8f0;
     --muted: #64748b;
     --danger: #ef4444;
+    --warning: #f59e0b;
   }
 
   * {
@@ -40,7 +41,7 @@
   }
 
   .section-title {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     margin-bottom: 8px;
     color: var(--text);
@@ -94,6 +95,38 @@
   .est-time {
     color: #2563eb;
     font-size: 13px;
+  }
+
+  /* Detailed Load Breakdown Table */
+  .load-eta-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 4px;
+    font-size: 11px;
+  }
+
+  .load-eta-table th {
+    text-align: left;
+    color: var(--muted);
+    font-weight: 700;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .load-eta-table td {
+    padding: 6px 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .load-eta-table td:last-child {
+    text-align: right;
+    font-weight: 700;
+  }
+
+  .badge-unassigned {
+    color: var(--danger);
+    font-size: 10px;
+    font-weight: 600;
   }
 
   /* Condensed Tasks Styling */
@@ -314,6 +347,12 @@
     font-weight: 600;
   }
 
+  .member-task-pill.load-pill.active {
+    background: #eff6ff;
+    border-color: #2563eb;
+    color: #2563eb;
+  }
+
   .member-task-pill input {
     width: auto;
     margin: 0 4px 0 0;
@@ -414,6 +453,24 @@
           <div class="summary-value est-time" id="pm_est">--:--</div>
         </div>
       </div>
+    </div>
+
+    <!-- LOAD COMPLETION ETAs -->
+    <div class="summary-box">
+      <div class="summary-box-title">Individual Load ETAs</div>
+      <table class="load-eta-table">
+        <thead>
+          <tr>
+            <th>Load</th>
+            <th>Cartons</th>
+            <th>Assigned</th>
+            <th style="text-align:right;">Est. Finish</th>
+          </tr>
+        </thead>
+        <tbody id="load_eta_rows">
+          <!-- Dynamically populated -->
+        </tbody>
+      </table>
     </div>
 
     <!-- TOTAL SUMMARY -->
@@ -592,11 +649,11 @@ function toggleMemberTaskPill(pill, checkbox) {
 
 /* Load configuration and defaults */
 const loadsList = [
-  { name: "Heathwood Chilled", defaultGroup: "AM" },
-  { name: "Heathwood Meat", defaultGroup: "AM" },
-  { name: "BRDC Milk", defaultGroup: "PM" },
-  { name: "BRDC Fresh", defaultGroup: "PM" },
-  { name: "BRDC Chilled", defaultGroup: "PM" }
+  { name: "Heathwood Chilled", defaultGroup: "AM", shortName: "HW Chilled" },
+  { name: "Heathwood Meat", defaultGroup: "AM", shortName: "HW Meat" },
+  { name: "BRDC Milk", defaultGroup: "PM", shortName: "BRDC Milk" },
+  { name: "BRDC Fresh", defaultGroup: "PM", shortName: "BRDC Fresh" },
+  { name: "BRDC Chilled", defaultGroup: "PM", shortName: "BRDC Chilled" }
 ];
 
 const defaultRates = {
@@ -687,7 +744,19 @@ function addTeam(){
           <div class="break-note"><span class="t-break">-0.5h break</span></div>
         </div>
       </div>
-      <div class="member-tasks-title">Assigned Tasks</div>
+      
+      <!-- Assigned Loads -->
+      <div class="member-tasks-title">Assigned Loads</div>
+      <div class="member-tasks-grid">
+        ${loadsList.map(l => `
+          <label class="member-task-pill load-pill" onclick="toggleMemberTaskPill(this, this.querySelector('input'))">
+            <input type="checkbox" class="load-assign" data-load="${l.name}" onchange="calc()">${l.shortName}
+          </label>
+        `).join('')}
+      </div>
+
+      <!-- Assigned Tasks -->
+      <div class="member-tasks-title">Assigned Daily Tasks</div>
       <div class="member-tasks-grid">
         <label class="member-task-pill" onclick="toggleMemberTaskPill(this, this.querySelector('input'))">
           <input type="checkbox" onchange="calc()">Gap Scan
@@ -749,7 +818,18 @@ function calc(){
   let amReqHours = 0;
   let pmReqHours = 0;
 
-  // 1. Calculate Load Targets per window
+  // Track load stats for individual ETA calculation
+  let loadStats = {};
+  loadsList.forEach(l => {
+    loadStats[l.name] = {
+      cartons: 0,
+      reqHours: 0,
+      assignedCount: 0,
+      window: l.defaultGroup
+    };
+  });
+
+  // 1. Calculate Load Targets per window & store stats
   loadsList.forEach(l => {
     let safeId = cleanId(l.name);
     let cartonInput = document.getElementById('c_' + safeId);
@@ -762,6 +842,10 @@ function calc(){
     totalCartons += cartons;
     let reqHours = cartons / rate;
 
+    loadStats[l.name].cartons = cartons;
+    loadStats[l.name].reqHours = reqHours;
+    loadStats[l.name].window = group;
+
     if (group === 'AM') {
       amReqHours += reqHours;
     } else {
@@ -770,7 +854,6 @@ function calc(){
   });
 
   // 2. Add Selected Task Hours to Window Targets
-  // AM Tasks
   let taskGap = document.getElementById('task_gap');
   let taskDoubleBeep = document.getElementById('task_double_beep');
   let taskLno = document.getElementById('task_lno');
@@ -781,7 +864,6 @@ function calc(){
   if (taskLno && taskLno.checked) amReqHours += 1.0;
   if (taskHuddle && taskHuddle.checked) amReqHours += 0.5;
 
-  // PM Tasks
   let taskOoc = document.getElementById('task_ooc');
   let taskRotation = document.getElementById('task_rotation');
   let taskReady = document.getElementById('task_ready');
@@ -792,7 +874,7 @@ function calc(){
   if (taskReady && taskReady.checked) pmReqHours += 0.5;
   if (taskManagers && taskManagers.checked) pmReqHours += 2.0;
 
-  // 3. Calculate Team Hours per window based on start/finish times & Woolworths EA breaks
+  // 3. Calculate Team Hours & Load Assignments
   let amTeamHours = 0;
   let pmTeamHours = 0;
   let activeAMHeadcount = 0;
@@ -802,6 +884,14 @@ function calc(){
     let startVal = card.querySelector('.t-start').value;
     let endVal = card.querySelector('.t-end').value;
 
+    // Count load assignments for this worker
+    card.querySelectorAll('.load-assign:checked').forEach(cb => {
+      let loadName = cb.getAttribute('data-load');
+      if (loadStats[loadName]) {
+        loadStats[loadName].assignedCount++;
+      }
+    });
+
     if (startVal && endVal) {
       let [sH, sM] = startVal.split(':').map(Number);
       let [eH, eM] = endVal.split(':').map(Number);
@@ -809,27 +899,21 @@ function calc(){
       let shiftStart = sH + (sM / 60);
       let shiftEnd = eH + (eM / 60);
 
-      // Support overnight or next-day shifts if finish < start
       if (shiftEnd < shiftStart) shiftEnd += 24;
 
       let grossShiftHours = shiftEnd - shiftStart;
-      
-      // Woolworths EA: 30-min (0.5h) unpaid break for shifts >= 5 hours
       let unpaidBreak = (grossShiftHours >= 5.0) ? 0.5 : 0.0;
       let netPaidHours = Math.max(0, grossShiftHours - unpaidBreak);
 
-      // Display net paid hours and break info
       card.querySelector('.t-hrs').innerText = netPaidHours.toFixed(1);
       card.querySelector('.t-break').innerText = unpaidBreak > 0 ? '-0.5h break' : 'no break';
 
-      // Calculate gross overlap per window
       let amGrossOverlap = getOverlapHours(shiftStart, shiftEnd, AM_WINDOW_START, AM_WINDOW_END);
       let pmGrossOverlap = getOverlapHours(shiftStart, shiftEnd, PM_WINDOW_START, PM_WINDOW_END);
 
       if (amGrossOverlap > 0) activeAMHeadcount++;
       if (pmGrossOverlap > 0) activePMHeadcount++;
 
-      // Deduct break proportionally across windows if shift spans both windows
       if (grossShiftHours > 0) {
         let amRatio = amGrossOverlap / grossShiftHours;
         let pmRatio = pmGrossOverlap / grossShiftHours;
@@ -847,7 +931,7 @@ function calc(){
   let totalTeam = amTeamHours + pmTeamHours;
   let totalVariance = totalTeam - totalReq;
 
-  // 5. Estimate Completion Times
+  // 5. Estimate Window Completion Times
   let amEstTime = "--:--";
   if (activeAMHeadcount > 0) {
     let amCompletionHour = AM_WINDOW_START + (amReqHours / activeAMHeadcount);
@@ -859,6 +943,34 @@ function calc(){
     let pmCompletionHour = PM_WINDOW_START + (pmReqHours / activePMHeadcount);
     pmEstTime = formatTime(pmCompletionHour);
   }
+
+  // 6. Build Individual Load ETA Rows
+  let loadEtaRowsHtml = '';
+  loadsList.forEach(l => {
+    let stat = loadStats[l.name];
+    let loadEta = "--:--";
+    let assignedLabel = `${stat.assignedCount} member${stat.assignedCount !== 1 ? 's' : ''}`;
+
+    if (stat.cartons === 0) {
+      loadEta = "No Cartons";
+    } else if (stat.assignedCount === 0) {
+      loadEta = `<span class="badge-unassigned">No Staff</span>`;
+    } else {
+      let windowStart = (stat.window === 'AM') ? AM_WINDOW_START : PM_WINDOW_START;
+      let loadFinishHour = windowStart + (stat.reqHours / stat.assignedCount);
+      loadEta = formatTime(loadFinishHour);
+    }
+
+    loadEtaRowsHtml += `
+      <tr>
+        <td><strong>${l.shortName}</strong></td>
+        <td>${stat.cartons}</td>
+        <td>${assignedLabel}</td>
+        <td style="text-align:right;" class="est-time">${loadEta}</td>
+      </tr>
+    `;
+  });
+  document.getElementById('load_eta_rows').innerHTML = loadEtaRowsHtml;
 
   // Update AM UI
   document.getElementById('am_tr').innerText = amReqHours.toFixed(1) + 'h';
