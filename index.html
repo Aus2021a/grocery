@@ -653,7 +653,6 @@ function calculateWindowFinish(windowStart, windowEnd, requiredHours, memberShif
       let isWorkingShift = (currentTime >= shift.start && currentTime < shift.end);
       let isLocked = false;
 
-      // Front of window lockout (e.g. Meat/Poultry Overs right at start of window)
       if (shift.frontTaskHours > 0) {
         let frontTaskEnd = Math.max(shift.start, windowStart) + shift.frontTaskHours;
         if (currentTime >= shift.start && currentTime < frontTaskEnd) {
@@ -661,7 +660,6 @@ function calculateWindowFinish(windowStart, windowEnd, requiredHours, memberShif
         }
       }
 
-      // Morning core lockout (07:00 - 09:00 tasks)
       if (!isLocked && shift.hasCoreTasks && currentTime >= 7.0 && currentTime < 9.0) {
         let taskEndTime = 7.0 + (shift.coreTaskHours || 0);
         if (currentTime < taskEndTime) {
@@ -685,6 +683,73 @@ function calculateWindowFinish(windowStart, windowEnd, requiredHours, memberShif
   return formatTime(currentTime);
 }
 
+/* Sequential multi-load calculation for individual loads assigned to members */
+function calculateSequentialLoadEtas(loadsList, loadStats, rawTeamMembers) {
+  let memberLoadSchedules = {};
+
+  rawTeamMembers.forEach(member => {
+    memberLoadSchedules[member.id] = {
+      availableTime: member.shiftStart,
+      shiftStart: member.shiftStart,
+      shiftEnd: member.shiftEnd,
+      frontTaskHours: member.frontTaskHours,
+      hasCoreTasks: member.hasCoreTasks,
+      coreTaskHours: member.coreTaskHours
+    };
+  });
+
+  loadsList.forEach(l => {
+    let stat = loadStats[l.name];
+    if (stat.cartons === 0 || stat.assignedMemberIds.length === 0) return;
+
+    let windowStart = (stat.window === 'AM') ? AM_WINDOW_START : PM_WINDOW_START;
+    let remainingReqHours = stat.reqHours;
+
+    // Find earliest time work on this specific load can begin across assigned workers
+    let currentTime = 24;
+    stat.assignedMemberIds.forEach(mId => {
+      let mSched = memberLoadSchedules[mId];
+      let readyTime = Math.max(mSched.availableTime, windowStart);
+      if (readyTime < currentTime) currentTime = readyTime;
+    });
+
+    while (remainingReqHours > 0 && currentTime < 30) {
+      let activeWorkers = 0;
+
+      stat.assignedMemberIds.forEach(mId => {
+        let mSched = memberLoadSchedules[mId];
+        let isWorking = (currentTime >= mSched.shiftStart && currentTime < mSched.shiftEnd && currentTime >= mSched.availableTime);
+        let isLocked = false;
+
+        if (mSched.frontTaskHours > 0) {
+          let frontEnd = Math.max(mSched.shiftStart, windowStart) + mSched.frontTaskHours;
+          if (currentTime >= mSched.shiftStart && currentTime < frontEnd) isLocked = true;
+        }
+
+        if (!isLocked && mSched.hasCoreTasks && currentTime >= 7.0 && currentTime < 9.0) {
+          let taskEnd = 7.0 + (mSched.coreTaskHours || 0);
+          if (currentTime < taskEnd) isLocked = true;
+        }
+
+        if (isWorking && !isLocked) activeWorkers++;
+      });
+
+      if (activeWorkers > 0) {
+        remainingReqHours -= (activeWorkers / 60);
+      }
+
+      currentTime += 1/60;
+    }
+
+    stat.computedEta = formatTime(currentTime);
+
+    // Update availability for assigned members so next sequential load starts after this finish time
+    stat.assignedMemberIds.forEach(mId => {
+      memberLoadSchedules[mId].availableTime = currentTime;
+    });
+  });
+}
+
 function calc(){
   let totalCartons = 0;
   let amReqHours = 0;
@@ -696,8 +761,10 @@ function calc(){
       cartons: 0,
       reqHours: 0,
       assignedMembers: [],
+      assignedMemberIds: [],
       memberShifts: [],
-      window: l.defaultGroup
+      window: l.defaultGroup,
+      computedEta: "--:--"
     };
   });
 
@@ -738,11 +805,13 @@ function calc(){
   let pmTeamHours = 0;
   let amShifts = [];
   let pmShifts = [];
+  let rawTeamMembers = [];
 
   let teamCards = document.querySelectorAll('.team-card');
   teamCards.forEach((card, idx) => {
     let nameInput = card.querySelector('.t-name');
     let memberName = (nameInput && nameInput.value.trim() !== '') ? nameInput.value.trim() : `Member ${idx + 1}`;
+    let memberId = card.id;
 
     let startVal = card.querySelector('.t-start').value;
     let endVal = card.querySelector('.t-end').value;
@@ -782,12 +851,23 @@ function calc(){
       });
 
       let shiftInfo = {
+        id: memberId,
         start: shiftStart,
         end: shiftEnd,
         hasCoreTasks: hasCoreTasks,
         coreTaskHours: coreTaskHours,
         frontTaskHours: frontTaskHours
       };
+
+      rawTeamMembers.push({
+        id: memberId,
+        name: memberName,
+        shiftStart: shiftStart,
+        shiftEnd: shiftEnd,
+        frontTaskHours: frontTaskHours,
+        hasCoreTasks: hasCoreTasks,
+        coreTaskHours: coreTaskHours
+      });
 
       let amGrossOverlap = getOverlapHours(shiftStart, shiftEnd, AM_WINDOW_START, AM_WINDOW_END);
       let pmGrossOverlap = getOverlapHours(shiftStart, shiftEnd, PM_WINDOW_START, PM_WINDOW_END);
@@ -807,6 +887,7 @@ function calc(){
         let loadName = cb.getAttribute('data-load');
         if (loadStats[loadName]) {
           loadStats[loadName].assignedMembers.push(memberName);
+          loadStats[loadName].assignedMemberIds.push(memberId);
           loadStats[loadName].memberShifts.push(shiftInfo);
         }
       });
@@ -831,6 +912,8 @@ function calc(){
     }
   });
 
+  calculateSequentialLoadEtas(loadsList, loadStats, rawTeamMembers);
+
   let amVariance = amTeamHours - amReqHours;
   let pmVariance = pmTeamHours - pmReqHours;
   let totalReq = amReqHours + pmReqHours;
@@ -843,18 +926,16 @@ function calc(){
   let loadEtaRowsHtml = '';
   loadsList.forEach(l => {
     let stat = loadStats[l.name];
-    let loadEta = "--:--";
     let count = stat.assignedMembers.length;
     let assignedLabel = count > 0 ? stat.assignedMembers.join(', ') : `<span class="badge-unassigned">No Staff</span>`;
+    let loadEta = "--:--";
 
     if (stat.cartons === 0) {
       loadEta = "No Cartons";
     } else if (count === 0) {
       loadEta = `<span class="badge-unassigned">No Staff</span>`;
     } else {
-      let windowStart = (stat.window === 'AM') ? AM_WINDOW_START : PM_WINDOW_START;
-      let windowEnd = (stat.window === 'AM') ? AM_WINDOW_END : PM_WINDOW_END;
-      loadEta = calculateWindowFinish(windowStart, windowEnd, stat.reqHours, stat.memberShifts);
+      loadEta = stat.computedEta;
     }
 
     loadEtaRowsHtml += `
