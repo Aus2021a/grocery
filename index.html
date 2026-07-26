@@ -97,15 +97,15 @@
     font-size: 13px;
   }
 
-  /* Detailed Load Breakdown Table */
-  .load-eta-table {
+  /* Tables for Load ETAs & Task Allocations */
+  .summary-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 4px;
     font-size: 11px;
   }
 
-  .load-eta-table th {
+  .summary-table th {
     text-align: left;
     color: var(--muted);
     font-weight: 700;
@@ -113,12 +113,12 @@
     border-bottom: 1px solid var(--border);
   }
 
-  .load-eta-table td {
+  .summary-table td {
     padding: 6px 0;
     border-bottom: 1px solid #f1f5f9;
   }
 
-  .load-eta-table td:last-child {
+  .summary-table td:last-child {
     text-align: right;
     font-weight: 700;
   }
@@ -127,82 +127,6 @@
     color: var(--danger);
     font-size: 10px;
     font-weight: 600;
-  }
-
-  /* Condensed Tasks Styling */
-  .task-group-title {
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--muted);
-    text-transform: uppercase;
-    margin: 8px 0 4px 0;
-    letter-spacing: 0.5px;
-  }
-
-  .task-group-title:first-child {
-    margin-top: 0;
-  }
-
-  .task-list {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-  }
-
-  .task-item {
-    display: flex;
-    align-items: center;
-    background: #f8fafc;
-    border: 1px solid var(--border);
-    padding: 6px 8px;
-    border-radius: 6px;
-    cursor: pointer;
-    user-select: none;
-    transition: background 0.15s, border-color 0.15s;
-  }
-
-  .task-item.active {
-    background: #e6f4ea;
-    border-color: var(--primary);
-  }
-
-  .task-checkbox {
-    width: 14px;
-    height: 14px;
-    accent-color: var(--primary);
-    margin-right: 6px;
-    cursor: pointer;
-  }
-
-  .task-info {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .task-title {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .task-meta {
-    font-size: 9px;
-    color: var(--muted);
-    line-height: 1.1;
-  }
-
-  .task-hours {
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--primary);
-    background: #fff;
-    padding: 2px 4px;
-    border-radius: 4px;
-    border: 1px solid var(--border);
-    margin-left: 4px;
   }
 
   .form-group {
@@ -458,12 +382,12 @@
     <!-- LOAD COMPLETION ETAs -->
     <div class="summary-box">
       <div class="summary-box-title">Individual Load ETAs</div>
-      <table class="load-eta-table">
+      <table class="summary-table">
         <thead>
           <tr>
             <th>Load</th>
             <th>Cartons</th>
-            <th>Assigned</th>
+            <th>Assigned To</th>
             <th style="text-align:right;">Est. Finish</th>
           </tr>
         </thead>
@@ -473,8 +397,25 @@
       </table>
     </div>
 
+    <!-- DAILY TASK ALLOCATIONS -->
+    <div class="summary-box">
+      <div class="summary-box-title">Daily Task Allocations</div>
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Task</th>
+            <th>Assigned To</th>
+            <th style="text-align:right;">Hours</th>
+          </tr>
+        </thead>
+        <tbody id="task_allocation_rows">
+          <!-- Dynamically populated from Team Tab -->
+        </tbody>
+      </table>
+    </div>
+
     <!-- TOTAL SUMMARY -->
-    <div class="summary-box" style="background: #e6f4ea; border: 1px solid var(--primary);">
+    <div class="summary-box" style="background: #e6f4ea; border: 1px solid var(--primary); margin-bottom: 0;">
       <div class="summary-box-title" style="color: var(--primary);">Daily Total (Net Paid)</div>
       <div class="summary-grid" style="grid-template-columns: 1fr 1fr 1fr;">
         <div>
@@ -492,91 +433,6 @@
       </div>
     </div>
 
-  </div>
-
-  <!-- CONDENSED TASKS SECTION -->
-  <div class="card">
-    <div class="section-title">Daily Task Allocations</div>
-    
-    <!-- AM TASKS -->
-    <div class="task-group-title">AM Window Tasks</div>
-    <div class="task-list">
-      <label class="task-item" id="item_task_gap">
-        <input type="checkbox" id="task_gap" class="task-checkbox" onchange="toggleTaskStyle('task_gap', 'item_task_gap'); calc();">
-        <div class="task-info">
-          <div class="task-title">Gap Scan</div>
-          <div class="task-meta">AM Window</div>
-        </div>
-        <div class="task-hours">1.0h</div>
-      </label>
-
-      <label class="task-item" id="item_task_double_beep">
-        <input type="checkbox" id="task_double_beep" class="task-checkbox" onchange="toggleTaskStyle('task_double_beep', 'item_task_double_beep'); calc();">
-        <div class="task-info">
-          <div class="task-title">Double Beep</div>
-          <div class="task-meta">AM Window</div>
-        </div>
-        <div class="task-hours">0.5h</div>
-      </label>
-
-      <label class="task-item" id="item_task_lno">
-        <input type="checkbox" id="task_lno" class="task-checkbox" onchange="toggleTaskStyle('task_lno', 'item_task_lno'); calc();">
-        <div class="task-info">
-          <div class="task-title">LNO</div>
-          <div class="task-meta">AM Window</div>
-        </div>
-        <div class="task-hours">1.0h</div>
-      </label>
-
-      <label class="task-item" id="item_task_huddle">
-        <input type="checkbox" id="task_huddle" class="task-checkbox" onchange="toggleTaskStyle('task_huddle', 'item_task_huddle'); calc();">
-        <div class="task-info">
-          <div class="task-title">Daily Huddle</div>
-          <div class="task-meta">09:00 AM</div>
-        </div>
-        <div class="task-hours">0.5h</div>
-      </label>
-    </div>
-
-    <!-- PM TASKS -->
-    <div class="task-group-title" style="margin-top: 10px;">PM Window Tasks</div>
-    <div class="task-list">
-      <label class="task-item" id="item_task_ooc">
-        <input type="checkbox" id="task_ooc" class="task-checkbox" onchange="toggleTaskStyle('task_ooc', 'item_task_ooc'); calc();">
-        <div class="task-info">
-          <div class="task-title">Out Of Code</div>
-          <div class="task-meta">13:00 - 15:00</div>
-        </div>
-        <div class="task-hours">2.0h</div>
-      </label>
-
-      <label class="task-item" id="item_task_rotation">
-        <input type="checkbox" id="task_rotation" class="task-checkbox" onchange="toggleTaskStyle('task_rotation', 'item_task_rotation'); calc();">
-        <div class="task-info">
-          <div class="task-title">Rotation Check</div>
-          <div class="task-meta">13:00 - 16:00</div>
-        </div>
-        <div class="task-hours">3.0h</div>
-      </label>
-
-      <label class="task-item" id="item_task_ready">
-        <input type="checkbox" id="task_ready" class="task-checkbox" onchange="toggleTaskStyle('task_ready', 'item_task_ready'); calc();">
-        <div class="task-info">
-          <div class="task-title">Ready to Fill</div>
-          <div class="task-meta">PM Window</div>
-        </div>
-        <div class="task-hours">0.5h</div>
-      </label>
-
-      <label class="task-item" id="item_task_managers">
-        <input type="checkbox" id="task_managers" class="task-checkbox" onchange="toggleTaskStyle('task_managers', 'item_task_managers'); calc();">
-        <div class="task-info">
-          <div class="task-title">Managers Mtg</div>
-          <div class="task-meta">14:00 - 16:00</div>
-        </div>
-        <div class="task-hours">2.0h</div>
-      </label>
-    </div>
   </div>
 </div>
 
@@ -627,18 +483,6 @@ function showTab(tab) {
   document.getElementById('nav-' + tab).classList.add('active');
 }
 
-function toggleTaskStyle(checkboxId, containerId) {
-  let cb = document.getElementById(checkboxId);
-  let container = document.getElementById(containerId);
-  if (cb && container) {
-    if (cb.checked) {
-      container.classList.add('active');
-    } else {
-      container.classList.remove('active');
-    }
-  }
-}
-
 function toggleMemberTaskPill(pill, checkbox) {
   if (checkbox.checked) {
     pill.classList.add('active');
@@ -654,6 +498,18 @@ const loadsList = [
   { name: "BRDC Milk", defaultGroup: "PM", shortName: "BRDC Milk" },
   { name: "BRDC Fresh", defaultGroup: "PM", shortName: "BRDC Fresh" },
   { name: "BRDC Chilled", defaultGroup: "PM", shortName: "BRDC Chilled" }
+];
+
+/* Master list of daily tasks */
+const dailyTasksList = [
+  { id: "Gap Scan", name: "Gap Scan", window: "AM", hours: 1.0 },
+  { id: "Dbl Beep", name: "Double Beep", window: "AM", hours: 0.5 },
+  { id: "LNO", name: "LNO", window: "AM", hours: 1.0 },
+  { id: "Huddle", name: "Daily Huddle", window: "AM", hours: 0.5 },
+  { id: "OOC", name: "Out Of Code", window: "PM", hours: 2.0 },
+  { id: "Rotation", name: "Rotation Check", window: "PM", hours: 3.0 },
+  { id: "Ready Fill", name: "Ready to Fill", window: "PM", hours: 0.5 },
+  { id: "Managers", name: "Managers Mtg", window: "PM", hours: 2.0 }
 ];
 
 const defaultRates = {
@@ -727,7 +583,7 @@ function addTeam(){
   let row = `
     <div class="team-card" id="t_${id}">
       <div class="team-header">
-        <input type="text" placeholder="Member Name" style="flex:1;">
+        <input type="text" class="t-name" placeholder="Member Name" style="flex:1;" oninput="calc()">
         <button type="button" class="btn-remove" onclick="removeTeam(${id})">✕</button>
       </div>
       <div class="team-times">
@@ -755,33 +611,14 @@ function addTeam(){
         `).join('')}
       </div>
 
-      <!-- Assigned Tasks -->
+      <!-- Assigned Daily Tasks -->
       <div class="member-tasks-title">Assigned Daily Tasks</div>
       <div class="member-tasks-grid">
-        <label class="member-task-pill" onclick="toggleMemberTaskPill(this, this.querySelector('input'))">
-          <input type="checkbox" onchange="calc()">Gap Scan
-        </label>
-        <label class="member-task-pill" onclick="toggleMemberTaskPill(this, this.querySelector('input'))">
-          <input type="checkbox" onchange="calc()">Dbl Beep
-        </label>
-        <label class="member-task-pill" onclick="toggleMemberTaskPill(this, this.querySelector('input'))">
-          <input type="checkbox" onchange="calc()">LNO
-        </label>
-        <label class="member-task-pill" onclick="toggleMemberTaskPill(this, this.querySelector('input'))">
-          <input type="checkbox" onchange="calc()">Huddle
-        </label>
-        <label class="member-task-pill" onclick="toggleMemberTaskPill(this, this.querySelector('input'))">
-          <input type="checkbox" onchange="calc()">OOC
-        </label>
-        <label class="member-task-pill" onclick="toggleMemberTaskPill(this, this.querySelector('input'))">
-          <input type="checkbox" onchange="calc()">Rotation
-        </label>
-        <label class="member-task-pill" onclick="toggleMemberTaskPill(this, this.querySelector('input'))">
-          <input type="checkbox" onchange="calc()">Ready Fill
-        </label>
-        <label class="member-task-pill" onclick="toggleMemberTaskPill(this, this.querySelector('input'))">
-          <input type="checkbox" onchange="calc()">Managers
-        </label>
+        ${dailyTasksList.map(t => `
+          <label class="member-task-pill" onclick="toggleMemberTaskPill(this, this.querySelector('input'))">
+            <input type="checkbox" class="task-assign" data-task="${t.id}" onchange="calc()">${t.id}
+          </label>
+        `).join('')}
       </div>
     </div>`;
   document.getElementById('team').insertAdjacentHTML('beforeend', row);
@@ -824,8 +661,19 @@ function calc(){
     loadStats[l.name] = {
       cartons: 0,
       reqHours: 0,
-      assignedCount: 0,
+      assignedMembers: [],
       window: l.defaultGroup
+    };
+  });
+
+  // Track task assignments dynamically from Team tab
+  let taskStats = {};
+  dailyTasksList.forEach(t => {
+    taskStats[t.id] = {
+      name: t.name,
+      window: t.window,
+      hours: t.hours,
+      assignedMembers: []
     };
   });
 
@@ -853,42 +701,33 @@ function calc(){
     }
   });
 
-  // 2. Add Selected Task Hours to Window Targets
-  let taskGap = document.getElementById('task_gap');
-  let taskDoubleBeep = document.getElementById('task_double_beep');
-  let taskLno = document.getElementById('task_lno');
-  let taskHuddle = document.getElementById('task_huddle');
-
-  if (taskGap && taskGap.checked) amReqHours += 1.0;
-  if (taskDoubleBeep && taskDoubleBeep.checked) amReqHours += 0.5;
-  if (taskLno && taskLno.checked) amReqHours += 1.0;
-  if (taskHuddle && taskHuddle.checked) amReqHours += 0.5;
-
-  let taskOoc = document.getElementById('task_ooc');
-  let taskRotation = document.getElementById('task_rotation');
-  let taskReady = document.getElementById('task_ready');
-  let taskManagers = document.getElementById('task_managers');
-
-  if (taskOoc && taskOoc.checked) pmReqHours += 2.0;
-  if (taskRotation && taskRotation.checked) pmReqHours += 3.0;
-  if (taskReady && taskReady.checked) pmReqHours += 0.5;
-  if (taskManagers && taskManagers.checked) pmReqHours += 2.0;
-
-  // 3. Calculate Team Hours & Load Assignments
+  // 2. Process Team Roster, Shift Hours & Task Assignments
   let amTeamHours = 0;
   let pmTeamHours = 0;
   let activeAMHeadcount = 0;
   let activePMHeadcount = 0;
 
-  document.querySelectorAll('.team-card').forEach(card => {
+  let teamCards = document.querySelectorAll('.team-card');
+  teamCards.forEach((card, idx) => {
+    let nameInput = card.querySelector('.t-name');
+    let memberName = (nameInput && nameInput.value.trim() !== '') ? nameInput.value.trim() : `Member ${idx + 1}`;
+
     let startVal = card.querySelector('.t-start').value;
     let endVal = card.querySelector('.t-end').value;
 
-    // Count load assignments for this worker
+    // Collect Load Assignments
     card.querySelectorAll('.load-assign:checked').forEach(cb => {
       let loadName = cb.getAttribute('data-load');
       if (loadStats[loadName]) {
-        loadStats[loadName].assignedCount++;
+        loadStats[loadName].assignedMembers.push(memberName);
+      }
+    });
+
+    // Collect Task Assignments
+    card.querySelectorAll('.task-assign:checked').forEach(cb => {
+      let taskId = cb.getAttribute('data-task');
+      if (taskStats[taskId]) {
+        taskStats[taskId].assignedMembers.push(memberName);
       }
     });
 
@@ -924,6 +763,18 @@ function calc(){
     }
   });
 
+  // 3. Add Assigned Daily Task Hours to Required Window Targets
+  dailyTasksList.forEach(t => {
+    let stat = taskStats[t.id];
+    if (stat.assignedMembers.length > 0) {
+      if (stat.window === 'AM') {
+        amReqHours += stat.hours;
+      } else {
+        pmReqHours += stat.hours;
+      }
+    }
+  });
+
   // 4. Calculate Variances
   let amVariance = amTeamHours - amReqHours;
   let pmVariance = pmTeamHours - pmReqHours;
@@ -949,15 +800,16 @@ function calc(){
   loadsList.forEach(l => {
     let stat = loadStats[l.name];
     let loadEta = "--:--";
-    let assignedLabel = `${stat.assignedCount} member${stat.assignedCount !== 1 ? 's' : ''}`;
+    let count = stat.assignedMembers.length;
+    let assignedLabel = count > 0 ? stat.assignedMembers.join(', ') : `<span class="badge-unassigned">No Staff</span>`;
 
     if (stat.cartons === 0) {
       loadEta = "No Cartons";
-    } else if (stat.assignedCount === 0) {
+    } else if (count === 0) {
       loadEta = `<span class="badge-unassigned">No Staff</span>`;
     } else {
       let windowStart = (stat.window === 'AM') ? AM_WINDOW_START : PM_WINDOW_START;
-      let loadFinishHour = windowStart + (stat.reqHours / stat.assignedCount);
+      let loadFinishHour = windowStart + (stat.reqHours / count);
       loadEta = formatTime(loadFinishHour);
     }
 
@@ -971,6 +823,24 @@ function calc(){
     `;
   });
   document.getElementById('load_eta_rows').innerHTML = loadEtaRowsHtml;
+
+  // 7. Build Daily Task Allocation Rows
+  let taskAllocationRowsHtml = '';
+  dailyTasksList.forEach(t => {
+    let stat = taskStats[t.id];
+    let assignedLabel = stat.assignedMembers.length > 0 
+      ? stat.assignedMembers.join(', ') 
+      : `<span class="badge-unassigned">Unassigned</span>`;
+
+    taskAllocationRowsHtml += `
+      <tr>
+        <td><strong>${stat.name}</strong> <span style="font-size:9px; color:var(--muted);">(${stat.window})</span></td>
+        <td>${assignedLabel}</td>
+        <td style="text-align:right;">${stat.hours.toFixed(1)}h</td>
+      </tr>
+    `;
+  });
+  document.getElementById('task_allocation_rows').innerHTML = taskAllocationRowsHtml;
 
   // Update AM UI
   document.getElementById('am_tr').innerText = amReqHours.toFixed(1) + 'h';
