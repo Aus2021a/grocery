@@ -495,6 +495,8 @@ const loadsList = [
 ];
 
 const dailyTasksList = [
+  { id: "Meat Overs", name: "Meat Overs", window: "AM", hours: 0.75, isWindowFront: true },
+  { id: "Poultry Overs", name: "Poultry Overs", window: "AM", hours: 0.75, isWindowFront: true },
   { id: "Gap Scan", name: "Gap Scan", window: "AM", hours: 1.0, isMorningCore: true },
   { id: "Dbl Beep", name: "Double Beep", window: "AM", hours: 0.5, isMorningCore: true },
   { id: "LNO", name: "LNO", window: "AM", hours: 1.0, isMorningCore: true },
@@ -581,11 +583,11 @@ function addTeam(){
       <div class="team-times">
         <div>
           <label>Start</label>
-          <input type="time" class="t-start" value="06:00" onchange="calc()">
+          <input type="time" class="t-start" value="05:00" onchange="calc()">
         </div>
         <div>
           <label>Finish</label>
-          <input type="time" class="t-end" value="14:00" onchange="calc()">
+          <input type="time" class="t-end" value="13:00" onchange="calc()">
         </div>
         <div>
           <div class="calculated-hours"><span class="t-hrs">7.5</span>h</div>
@@ -638,7 +640,6 @@ function getOverlapHours(shiftStart, shiftEnd, windowStart, windowEnd) {
   return Math.max(0, end - start);
 }
 
-/* Completion logic that subtracts 07:00-09:00 core task commitments from load work availability */
 function calculateWindowFinish(windowStart, windowEnd, requiredHours, memberShifts) {
   if (requiredHours <= 0 || memberShifts.length === 0) return "--:--";
 
@@ -650,19 +651,25 @@ function calculateWindowFinish(windowStart, windowEnd, requiredHours, memberShif
 
     memberShifts.forEach(shift => {
       let isWorkingShift = (currentTime >= shift.start && currentTime < shift.end);
-      
-      // Lock out availability if assigned to 07:00-09:00 core tasks
-      let isLockedForTask = false;
-      if (shift.hasCoreTasks && currentTime >= 7.0 && currentTime < 9.0) {
-        // Calculate total hours of core tasks assigned
-        let coreTaskDuration = shift.coreTaskHours || 0;
-        let taskEndTime = 7.0 + coreTaskDuration;
-        if (currentTime < taskEndTime) {
-          isLockedForTask = true;
+      let isLocked = false;
+
+      // Front of window lockout (e.g. Meat/Poultry Overs right at start of window)
+      if (shift.frontTaskHours > 0) {
+        let frontTaskEnd = Math.max(shift.start, windowStart) + shift.frontTaskHours;
+        if (currentTime >= shift.start && currentTime < frontTaskEnd) {
+          isLocked = true;
         }
       }
 
-      if (isWorkingShift && !isLockedForTask) {
+      // Morning core lockout (07:00 - 09:00 tasks)
+      if (!isLocked && shift.hasCoreTasks && currentTime >= 7.0 && currentTime < 9.0) {
+        let taskEndTime = 7.0 + (shift.coreTaskHours || 0);
+        if (currentTime < taskEndTime) {
+          isLocked = true;
+        }
+      }
+
+      if (isWorkingShift && !isLocked) {
         activeWorkers++;
       }
     });
@@ -756,15 +763,21 @@ function calc(){
       card.querySelector('.t-hrs').innerText = netPaidHours.toFixed(1);
       card.querySelector('.t-break').innerText = unpaidBreak > 0 ? '-0.5h break' : 'no break';
 
-      // Check for assigned core tasks (07:00-09:00)
       let coreTaskHours = 0;
       let hasCoreTasks = false;
+      let frontTaskHours = 0;
+
       card.querySelectorAll('.task-assign:checked').forEach(cb => {
         let taskId = cb.getAttribute('data-task');
         let taskObj = dailyTasksList.find(t => t.id === taskId);
-        if (taskObj && taskObj.isMorningCore) {
-          hasCoreTasks = true;
-          coreTaskHours += taskObj.hours;
+        if (taskObj) {
+          if (taskObj.isMorningCore) {
+            hasCoreTasks = true;
+            coreTaskHours += taskObj.hours;
+          }
+          if (taskObj.isWindowFront) {
+            frontTaskHours += taskObj.hours;
+          }
         }
       });
 
@@ -772,7 +785,8 @@ function calc(){
         start: shiftStart,
         end: shiftEnd,
         hasCoreTasks: hasCoreTasks,
-        coreTaskHours: coreTaskHours
+        coreTaskHours: coreTaskHours,
+        frontTaskHours: frontTaskHours
       };
 
       let amGrossOverlap = getOverlapHours(shiftStart, shiftEnd, AM_WINDOW_START, AM_WINDOW_END);
@@ -865,7 +879,7 @@ function calc(){
       <tr>
         <td><strong>${stat.name}</strong> <span style="font-size:9px; color:var(--muted);">(${stat.window})</span></td>
         <td>${assignedLabel}</td>
-        <td style="text-align:right;">${stat.hours.toFixed(1)}h</td>
+        <td style="text-align:right;">${stat.hours.toFixed(2)}h</td>
       </tr>
     `;
   });
