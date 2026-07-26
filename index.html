@@ -638,7 +638,6 @@ function getOverlapHours(shiftStart, shiftEnd, windowStart, windowEnd) {
   return Math.max(0, end - start);
 }
 
-/* Dynamic finish time calculation considering staggered start times */
 function calculateWindowFinish(windowStart, windowEnd, requiredHours, activeShifts) {
   if (requiredHours <= 0 || activeShifts.length === 0) return "--:--";
 
@@ -733,8 +732,6 @@ function calc(){
       if (shiftEnd < shiftStart) shiftEnd += 24;
 
       let grossShiftHours = shiftEnd - shiftStart;
-      
-      // FIX 1: Break applies ONLY if shift is strictly GREATER than 5 hours (> 5.0)
       let unpaidBreak = (grossShiftHours > 5.0) ? 0.5 : 0.0;
       let netPaidHours = Math.max(0, grossShiftHours - unpaidBreak);
 
@@ -755,7 +752,6 @@ function calc(){
         pmTeamHours += Math.max(0, pmGrossOverlap - (unpaidBreak * pmRatio));
       }
 
-      // Collect Load Assignments
       card.querySelectorAll('.load-assign:checked').forEach(cb => {
         let loadName = cb.getAttribute('data-load');
         if (loadStats[loadName]) {
@@ -764,7 +760,6 @@ function calc(){
         }
       });
 
-      // Collect Task Assignments
       card.querySelectorAll('.task-assign:checked').forEach(cb => {
         let taskId = cb.getAttribute('data-task');
         if (taskStats[taskId]) {
@@ -791,7 +786,6 @@ function calc(){
   let totalTeam = amTeamHours + pmTeamHours;
   let totalVariance = totalTeam - totalReq;
 
-  // FIX 2: Accurate completion time calculations
   let amEstTime = calculateWindowFinish(AM_WINDOW_START, AM_WINDOW_END, amReqHours, amShifts);
   let pmEstTime = calculateWindowFinish(PM_WINDOW_START, PM_WINDOW_END, pmReqHours, pmShifts);
 
