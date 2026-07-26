@@ -159,16 +159,6 @@
     flex: 1.5;
   }
 
-  .load-row select {
-    flex: 1;
-    padding: 6px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    font-size: 12px;
-    background: #fff;
-    font-weight: 600;
-  }
-
   label {
     font-size: 12px;
     font-weight: 600;
@@ -341,55 +331,32 @@
 <!-- SUMMARY TAB -->
 <div id="summary" class="tab" style="display:block;">
   <div class="card">
-    <div class="section-title">Fill Window Breakdowns</div>
+    <div class="section-title">Daily Summary</div>
 
-    <!-- AM SUMMARY -->
+    <!-- SINGLE UNIFIED DAILY SUMMARY -->
     <div class="summary-box">
-      <div class="summary-box-title">AM Window (05:00 - 13:00)</div>
+      <div class="summary-box-title">Daily Fill Window</div>
       <div class="summary-grid">
         <div>
           <div class="summary-label">Target</div>
-          <div class="summary-value" id="am_tr">0.0h</div>
+          <div class="summary-value" id="daily_tr">0.0h</div>
         </div>
         <div>
           <div class="summary-label">Team</div>
-          <div class="summary-value" id="am_tm">0.0h</div>
+          <div class="summary-value" id="daily_tm">0.0h</div>
         </div>
         <div>
           <div class="summary-label">Variance</div>
-          <div class="summary-value" id="am_vr">0.0h</div>
+          <div class="summary-value" id="daily_vr">0.0h</div>
         </div>
         <div>
           <div class="summary-label">Est. Finish</div>
-          <div class="summary-value est-time" id="am_est">--:--</div>
+          <div class="summary-value est-time" id="daily_est">--:--</div>
         </div>
       </div>
     </div>
 
-    <!-- PM SUMMARY -->
-    <div class="summary-box">
-      <div class="summary-box-title">PM Window (13:00 - 21:00)</div>
-      <div class="summary-grid">
-        <div>
-          <div class="summary-label">Target</div>
-          <div class="summary-value" id="pm_tr">0.0h</div>
-        </div>
-        <div>
-          <div class="summary-label">Team</div>
-          <div class="summary-value" id="pm_tm">0.0h</div>
-        </div>
-        <div>
-          <div class="summary-label">Variance</div>
-          <div class="summary-value" id="pm_vr">0.0h</div>
-        </div>
-        <div>
-          <div class="summary-label">Est. Finish</div>
-          <div class="summary-value est-time" id="pm_est">--:--</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- LOAD COMPLETION ETAs -->
+    <!-- INDIVIDUAL LOAD ETAS -->
     <div class="summary-box">
       <div class="summary-box-title">Individual Load ETAs</div>
       <table class="summary-table">
@@ -445,7 +412,7 @@
 <!-- LOADS TAB -->
 <div id="loads" class="tab">
   <div class="card">
-    <div class="section-title">Carton Inputs & Shift Assignment</div>
+    <div class="section-title">Carton Inputs</div>
     <div id="cartonInputs"></div>
   </div>
 </div>
@@ -498,24 +465,25 @@ function toggleMemberTaskPill(pill, checkbox) {
 }
 
 const loadsList = [
-  { name: "Heathwood Chilled", defaultGroup: "AM", shortName: "HW Chilled" },
-  { name: "Heathwood Meat", defaultGroup: "AM", shortName: "HW Meat" },
-  { name: "BRDC Milk", defaultGroup: "PM", shortName: "BRDC Milk" },
-  { name: "BRDC Fresh", defaultGroup: "PM", shortName: "BRDC Fresh" },
-  { name: "BRDC Chilled", defaultGroup: "PM", shortName: "BRDC Chilled" }
+  { name: "Heathwood Chilled", shortName: "HW Chilled" },
+  { name: "Heathwood Meat", shortName: "HW Meat" },
+  { name: "BRDC Milk", shortName: "BRDC Milk" },
+  { name: "BRDC Fresh", shortName: "BRDC Fresh" },
+  { name: "BRDC Chilled", shortName: "BRDC Chilled" }
 ];
 
+// Tasks with explicit target load dependencies
 const dailyTasksList = [
-  { id: "Meat Overs", name: "Meat Overs", window: "AM", hours: 0.75, isFrontLoaded: true },
-  { id: "Poultry Overs", name: "Poultry Overs", window: "AM", hours: 0.75, isFrontLoaded: true },
-  { id: "Gap Scan", name: "Gap Scan", window: "AM", hours: 1.0, isFrontLoaded: true },
-  { id: "Dbl Beep", name: "Double Beep", window: "AM", hours: 0.5, isFrontLoaded: true },
-  { id: "LNO", name: "LNO", window: "AM", hours: 1.0, isFrontLoaded: true },
-  { id: "Huddle", name: "Daily Huddle", window: "AM", hours: 0.5, isFrontLoaded: false },
-  { id: "OOC", name: "Out Of Code", window: "PM", hours: 2.0, isFrontLoaded: false },
-  { id: "Rotation", name: "Rotation Check", window: "PM", hours: 3.0, isFrontLoaded: false },
-  { id: "Ready Fill", name: "Ready to Fill", window: "PM", hours: 0.5, isFrontLoaded: false },
-  { id: "Managers", name: "Managers Mtg", window: "PM", hours: 2.0, isFrontLoaded: false }
+  { id: "Meat Overs", name: "Meat Overs", hours: 0.75, blocksLoads: ["Heathwood Meat", "BRDC Fresh"] },
+  { id: "Poultry Overs", name: "Poultry Overs", hours: 0.75, blocksLoads: ["Heathwood Meat", "BRDC Fresh"] },
+  { id: "Gap Scan", name: "Gap Scan", hours: 1.0, blocksLoads: ["Heathwood Chilled"] },
+  { id: "Dbl Beep", name: "Double Beep", hours: 0.5, blocksLoads: ["Heathwood Chilled"] },
+  { id: "LNO", name: "LNO", hours: 1.0, blocksLoads: ["Heathwood Chilled"] },
+  { id: "Huddle", name: "Daily Huddle", hours: 0.5, blocksLoads: [] },
+  { id: "OOC", name: "Out Of Code", hours: 2.0, blocksLoads: [] },
+  { id: "Rotation", name: "Rotation Check", hours: 3.0, blocksLoads: [] },
+  { id: "Ready Fill", name: "Ready to Fill", hours: 0.5, blocksLoads: [] },
+  { id: "Managers", name: "Managers Mtg", hours: 2.0, blocksLoads: [] }
 ];
 
 const defaultRates = {
@@ -525,11 +493,6 @@ const defaultRates = {
   "BRDC Fresh": 80,
   "BRDC Chilled": 60
 };
-
-const AM_WINDOW_START = 5;
-const AM_WINDOW_END = 13;
-const PM_WINDOW_START = 13;
-const PM_WINDOW_END = 21;
 
 let r = {};
 try {
@@ -574,10 +537,6 @@ function buildCartonInputs(){
     h += `<div class="load-row">
             <label>${l.name}</label>
             <input type="number" id="c_${safeId}" value="0" min="0" placeholder="Cartons" oninput="calc()">
-            <select id="grp_${safeId}" onchange="calc()">
-              <option value="AM" ${l.defaultGroup === 'AM' ? 'selected' : ''}>AM</option>
-              <option value="PM" ${l.defaultGroup === 'PM' ? 'selected' : ''}>PM</option>
-            </select>
           </div>`;
   });
   document.getElementById('cartonInputs').innerHTML = h;
@@ -645,16 +604,10 @@ function formatTime(decimalHours) {
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 }
 
-function getOverlapHours(shiftStart, shiftEnd, windowStart, windowEnd) {
-  let start = Math.max(shiftStart, windowStart);
-  let end = Math.min(shiftEnd, windowEnd);
-  return Math.max(0, end - start);
-}
-
 function calc(){
   let totalCartons = 0;
-  let amReqHours = 0;
-  let pmReqHours = 0;
+  let dailyReqHours = 0;
+  let dailyTeamHours = 0;
 
   let loadStats = {};
   loadsList.forEach(l => {
@@ -663,7 +616,6 @@ function calc(){
       reqHours: 0,
       assignedMembers: [],
       assignedMemberIds: [],
-      window: l.defaultGroup,
       computedEta: "--:--",
       isUnfinished: false,
       leftoverCartons: 0
@@ -674,21 +626,18 @@ function calc(){
   dailyTasksList.forEach(t => {
     taskStats[t.id] = {
       name: t.name,
-      window: t.window,
       hours: t.hours,
+      blocksLoads: t.blocksLoads,
       assignedMembers: [],
-      assignedMemberIds: [],
-      isFrontLoaded: t.isFrontLoaded
+      assignedMemberIds: []
     };
   });
 
   loadsList.forEach(l => {
     let safeId = cleanId(l.name);
     let cartonInput = document.getElementById('c_' + safeId);
-    let groupSelect = document.getElementById('grp_' + safeId);
 
     let cartons = cartonInput ? parseFloat(cartonInput.value) || 0 : 0;
-    let group = groupSelect ? groupSelect.value : l.defaultGroup;
     let rate = r[l.name] || 60;
 
     totalCartons += cartons;
@@ -696,17 +645,9 @@ function calc(){
 
     loadStats[l.name].cartons = cartons;
     loadStats[l.name].reqHours = reqHours;
-    loadStats[l.name].window = group;
-
-    if (group === 'AM') {
-      amReqHours += reqHours;
-    } else {
-      pmReqHours += reqHours;
-    }
+    dailyReqHours += reqHours;
   });
 
-  let amTeamHours = 0;
-  let pmTeamHours = 0;
   let rawTeamMembers = [];
 
   let teamCards = document.querySelectorAll('.team-card');
@@ -764,23 +705,17 @@ function calc(){
         assignedLoads: assignedLoadsList
       });
 
-      let amGrossOverlap = getOverlapHours(shiftStart, shiftEnd, AM_WINDOW_START, AM_WINDOW_END);
-      let pmGrossOverlap = getOverlapHours(shiftStart, shiftEnd, PM_WINDOW_START, PM_WINDOW_END);
-
-      if (grossShiftHours > 0) {
-        let amRatio = amGrossOverlap / grossShiftHours;
-        let pmRatio = pmGrossOverlap / grossShiftHours;
-
-        amTeamHours += Math.max(0, amGrossOverlap - (unpaidBreak * amRatio));
-        pmTeamHours += Math.max(0, pmGrossOverlap - (unpaidBreak * pmRatio));
-      }
+      dailyTeamHours += netPaidHours;
     }
   });
 
-  // Calculate front-loaded task lockouts per member
-  let memberFrontLoadHours = {};
+  // Calculate task allocations per member and build task lockouts per load
+  let memberTaskLockoutsPerLoad = {};
   rawTeamMembers.forEach(m => {
-    memberFrontLoadHours[m.id] = 0;
+    memberTaskLockoutsPerLoad[m.id] = {};
+    loadsList.forEach(l => {
+      memberTaskLockoutsPerLoad[m.id][l.name] = 0;
+    });
   });
 
   dailyTasksList.forEach(t => {
@@ -788,22 +723,20 @@ function calc(){
     let count = stat.assignedMemberIds.length;
     if (count > 0) {
       let splitHours = stat.hours / count;
-      if (stat.window === 'AM') amReqHours += stat.hours;
-      else pmReqHours += stat.hours;
+      dailyReqHours += stat.hours;
 
-      if (stat.isFrontLoaded) {
+      if (stat.blocksLoads && stat.blocksLoads.length > 0) {
         stat.assignedMemberIds.forEach(mId => {
-          memberFrontLoadHours[mId] += splitHours;
+          stat.blocksLoads.forEach(targetLoad => {
+            memberTaskLockoutsPerLoad[mId][targetLoad] += splitHours;
+          });
         });
       }
     }
   });
 
-  // Simulation engine tracking staff shift timelines
-  let memberAvailableTime = {};
-  rawTeamMembers.forEach(m => {
-    memberAvailableTime[m.id] = m.shiftStart + (memberFrontLoadHours[m.id] || 0);
-  });
+  // Calculate individual load ETAs using exact worker availability per load
+  let latestLoadCompletion = 0;
 
   loadsList.forEach(l => {
     let stat = loadStats[l.name];
@@ -818,19 +751,19 @@ function calc(){
     stat.assignedMemberIds.forEach(mId => {
       let m = rawTeamMembers.find(x => x.id === mId);
       if (m) {
+        let availStart = m.shiftStart + (memberTaskLockoutsPerLoad[mId][l.name] || 0);
         if (m.shiftEnd > maxShiftEnd) maxShiftEnd = m.shiftEnd;
-      }
-      if (memberAvailableTime[mId] < simTime) {
-        simTime = memberAvailableTime[mId];
+        if (availStart < simTime) simTime = availStart;
       }
     });
 
-    // Check total remaining capacity of assigned team for this load
+    // Determine total available capacity for this load
     let totalCapacityCartons = 0;
     stat.assignedMemberIds.forEach(mId => {
       let m = rawTeamMembers.find(x => x.id === mId);
       if (m) {
-        let availHours = Math.max(0, m.shiftEnd - memberAvailableTime[mId]);
+        let availStart = m.shiftStart + (memberTaskLockoutsPerLoad[mId][l.name] || 0);
+        let availHours = Math.max(0, m.shiftEnd - availStart);
         totalCapacityCartons += availHours * rate;
       }
     });
@@ -842,14 +775,15 @@ function calc(){
       return;
     }
 
-    // Step minute-by-minute if capacity exists
+    // Step minute-by-minute if capacity is sufficient
     while (remainingCartons > 0 && simTime <= maxShiftEnd) {
       let activeCartonsPerMinute = 0;
 
       stat.assignedMemberIds.forEach(mId => {
         let m = rawTeamMembers.find(x => x.id === mId);
         if (m) {
-          if (simTime >= memberAvailableTime[mId] && simTime < m.shiftEnd) {
+          let availStart = m.shiftStart + (memberTaskLockoutsPerLoad[mId][l.name] || 0);
+          if (simTime >= availStart && simTime < m.shiftEnd) {
             activeCartonsPerMinute += (rate / 60);
           }
         }
@@ -868,34 +802,14 @@ function calc(){
       stat.computedEta = `Unfinished (${stat.leftoverCartons} left)`;
     } else {
       stat.computedEta = formatTime(simTime);
-      stat.assignedMemberIds.forEach(mId => {
-        if (simTime > memberAvailableTime[mId]) {
-          memberAvailableTime[mId] = simTime;
-        }
-      });
+      if (simTime > latestLoadCompletion) {
+        latestLoadCompletion = simTime;
+      }
     }
   });
 
-  // Window Finish Calculations
-  let windowMaxTimes = { AM: 5, PM: 13 };
-  loadsList.forEach(l => {
-    let stat = loadStats[l.name];
-    if (!stat.isUnfinished && stat.computedEta !== "--:--" && stat.computedEta.includes(':')) {
-      let [h, m] = stat.computedEta.split(':').map(Number);
-      let dec = h + (m / 60);
-      if (stat.window === 'AM' && dec > windowMaxTimes.AM) windowMaxTimes.AM = dec;
-      if (stat.window === 'PM' && dec > windowMaxTimes.PM) windowMaxTimes.PM = dec;
-    }
-  });
-
-  let amEstTime = windowMaxTimes.AM > 5 ? formatTime(windowMaxTimes.AM) : "--:--";
-  let pmEstTime = windowMaxTimes.PM > 13 ? formatTime(windowMaxTimes.PM) : "--:--";
-
-  let amVariance = amTeamHours - amReqHours;
-  let pmVariance = pmTeamHours - pmReqHours;
-  let totalReq = amReqHours + pmReqHours;
-  let totalTeam = amTeamHours + pmTeamHours;
-  let totalVariance = totalTeam - totalReq;
+  let overallEstFinish = latestLoadCompletion > 0 ? formatTime(latestLoadCompletion) : "--:--";
+  let dailyVariance = dailyTeamHours - dailyReqHours;
 
   // Render Table Output
   let loadEtaRowsHtml = '';
@@ -935,7 +849,7 @@ function calc(){
 
     taskAllocationRowsHtml += `
       <tr>
-        <td><strong>${stat.name}</strong> <span style="font-size:9px; color:var(--muted);">(${stat.window})</span></td>
+        <td><strong>${stat.name}</strong></td>
         <td>${assignedLabel}</td>
         <td style="text-align:right;">${stat.hours.toFixed(2)}h</td>
       </tr>
@@ -943,19 +857,14 @@ function calc(){
   });
   document.getElementById('task_allocation_rows').innerHTML = taskAllocationRowsHtml;
 
-  document.getElementById('am_tr').innerText = amReqHours.toFixed(1) + 'h';
-  document.getElementById('am_tm').innerText = amTeamHours.toFixed(1) + 'h';
-  document.getElementById('am_vr').innerText = amVariance.toFixed(1) + 'h';
-  document.getElementById('am_est').innerText = amEstTime;
-
-  document.getElementById('pm_tr').innerText = pmReqHours.toFixed(1) + 'h';
-  document.getElementById('pm_tm').innerText = pmTeamHours.toFixed(1) + 'h';
-  document.getElementById('pm_vr').innerText = pmVariance.toFixed(1) + 'h';
-  document.getElementById('pm_est').innerText = pmEstTime;
+  document.getElementById('daily_tr').innerText = dailyReqHours.toFixed(1) + 'h';
+  document.getElementById('daily_tm').innerText = dailyTeamHours.toFixed(1) + 'h';
+  document.getElementById('daily_vr').innerText = dailyVariance.toFixed(1) + 'h';
+  document.getElementById('daily_est').innerText = overallEstFinish;
 
   document.getElementById('tc').innerText = totalCartons;
-  document.getElementById('tr').innerText = totalReq.toFixed(1) + 'h';
-  document.getElementById('vr').innerText = totalVariance.toFixed(1) + 'h';
+  document.getElementById('tr').innerText = dailyReqHours.toFixed(1) + 'h';
+  document.getElementById('vr').innerText = dailyVariance.toFixed(1) + 'h';
 }
 
 window.addEventListener('DOMContentLoaded', () => {
