@@ -15,7 +15,7 @@
     --text: #1e293b;
     --border: #e2e8f0;
     --muted: #64748b;
-    --danger: #ef4444;
+    --danger: #dc2626;
     --warning: #f59e0b;
   }
 
@@ -123,14 +123,19 @@
 
   .badge-unassigned {
     color: var(--danger);
-    font-size: 10px;
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 700;
   }
 
   .badge-unfinished {
     color: var(--danger);
-    font-size: 11px;
-    font-weight: 700;
+    font-size: 12px;
+    font-weight: 800;
+    background: #fee2e2;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #fca5a5;
+    display: inline-block;
   }
 
   .form-group {
@@ -772,7 +777,7 @@ function calc(){
     }
   });
 
-  // Task time lockouts per member
+  // Calculate front-loaded task lockouts per member
   let memberFrontLoadHours = {};
   rawTeamMembers.forEach(m => {
     memberFrontLoadHours[m.id] = 0;
@@ -794,7 +799,7 @@ function calc(){
     }
   });
 
-  // Run simulation for Load ETAs with Shift Boundaries Check
+  // Simulation engine tracking staff shift timelines
   let memberAvailableTime = {};
   rawTeamMembers.forEach(m => {
     memberAvailableTime[m.id] = m.shiftStart + (memberFrontLoadHours[m.id] || 0);
@@ -807,9 +812,9 @@ function calc(){
     let rate = r[l.name] || 60;
     let remainingCartons = stat.cartons;
 
-    // Find latest end time of all assigned workers to know when shift capacity expires
     let maxShiftEnd = 0;
     let simTime = 24;
+
     stat.assignedMemberIds.forEach(mId => {
       let m = rawTeamMembers.find(x => x.id === mId);
       if (m) {
@@ -820,6 +825,24 @@ function calc(){
       }
     });
 
+    // Check total remaining capacity of assigned team for this load
+    let totalCapacityCartons = 0;
+    stat.assignedMemberIds.forEach(mId => {
+      let m = rawTeamMembers.find(x => x.id === mId);
+      if (m) {
+        let availHours = Math.max(0, m.shiftEnd - memberAvailableTime[mId]);
+        totalCapacityCartons += availHours * rate;
+      }
+    });
+
+    if (totalCapacityCartons < remainingCartons) {
+      stat.isUnfinished = true;
+      stat.leftoverCartons = Math.round(remainingCartons - totalCapacityCartons);
+      stat.computedEta = `Unfinished (${stat.leftoverCartons} left)`;
+      return;
+    }
+
+    // Step minute-by-minute if capacity exists
     while (remainingCartons > 0 && simTime <= maxShiftEnd) {
       let activeCartonsPerMinute = 0;
 
@@ -839,7 +862,7 @@ function calc(){
       simTime += (1 / 60);
     }
 
-    if (remainingCartons > 0.5) {
+    if (remainingCartons > 1) {
       stat.isUnfinished = true;
       stat.leftoverCartons = Math.round(remainingCartons);
       stat.computedEta = `Unfinished (${stat.leftoverCartons} left)`;
@@ -874,7 +897,7 @@ function calc(){
   let totalTeam = amTeamHours + pmTeamHours;
   let totalVariance = totalTeam - totalReq;
 
-  // Render Output
+  // Render Table Output
   let loadEtaRowsHtml = '';
   loadsList.forEach(l => {
     let stat = loadStats[l.name];
