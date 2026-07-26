@@ -32,42 +32,42 @@
   header {
     background: var(--primary);
     color: #fff;
-    padding: 18px;
+    padding: 14px;
     text-align: center;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 600;
-    border-radius: 0 0 16px 16px;
+    border-radius: 0 0 14px 14px;
   }
 
   .section-title {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     color: var(--text);
   }
 
   .card {
     background: var(--card);
-    border-radius: 14px;
-    padding: 16px;
-    margin: 16px;
+    border-radius: 12px;
+    padding: 12px;
+    margin: 12px;
     border: 1px solid var(--border);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   }
 
   /* Split Summary Grid */
   .summary-box {
     background: #f1f5f9;
-    padding: 12px;
-    border-radius: 10px;
-    margin-bottom: 12px;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 8px;
   }
 
   .summary-box-title {
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 700;
     color: var(--primary);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     text-transform: uppercase;
     border-bottom: 1px solid var(--border);
     padding-bottom: 4px;
@@ -75,29 +75,34 @@
 
   .summary-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 8px;
+    grid-template-columns: 1fr 1fr 1fr 1.2fr;
+    gap: 6px;
     text-align: center;
   }
 
   .summary-label {
-    font-size: 11px;
+    font-size: 10px;
     color: var(--muted);
   }
 
   .summary-value {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--text);
   }
 
-  /* Tasks Styling */
+  .est-time {
+    color: #2563eb;
+    font-size: 13px;
+  }
+
+  /* Condensed Tasks Styling */
   .task-group-title {
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 700;
     color: var(--muted);
     text-transform: uppercase;
-    margin: 12px 0 6px 0;
+    margin: 8px 0 4px 0;
     letter-spacing: 0.5px;
   }
 
@@ -106,9 +111,9 @@
   }
 
   .task-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
   }
 
   .task-item {
@@ -116,15 +121,11 @@
     align-items: center;
     background: #f8fafc;
     border: 1px solid var(--border);
-    padding: 10px 12px;
-    border-radius: 10px;
+    padding: 6px 8px;
+    border-radius: 6px;
     cursor: pointer;
     user-select: none;
-    transition: background 0.2s ease, border-color 0.2s ease;
-  }
-
-  .task-item:hover {
-    background: #f1f5f9;
+    transition: background 0.15s, border-color 0.15s;
   }
 
   .task-item.active {
@@ -133,53 +134,58 @@
   }
 
   .task-checkbox {
-    width: 20px;
-    height: 20px;
+    width: 14px;
+    height: 14px;
     accent-color: var(--primary);
-    margin-right: 12px;
+    margin-right: 6px;
     cursor: pointer;
   }
 
   .task-info {
     flex: 1;
+    min-width: 0;
   }
 
   .task-title {
-    font-size: 14px;
+    font-size: 11px;
     font-weight: 600;
     color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .task-meta {
-    font-size: 11px;
+    font-size: 9px;
     color: var(--muted);
-    margin-top: 2px;
+    line-height: 1.1;
   }
 
   .task-hours {
-    font-size: 13px;
+    font-size: 10px;
     font-weight: 700;
     color: var(--primary);
     background: #fff;
-    padding: 4px 8px;
-    border-radius: 6px;
+    padding: 2px 4px;
+    border-radius: 4px;
     border: 1px solid var(--border);
+    margin-left: 4px;
   }
 
   .form-group {
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
 
   .load-row {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     align-items: center;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
 
   .load-row label {
     flex: 2;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
   }
 
@@ -189,61 +195,61 @@
 
   .load-row select {
     flex: 1;
-    padding: 10px;
-    border-radius: 10px;
+    padding: 6px;
+    border-radius: 6px;
     border: 1px solid var(--border);
-    font-size: 13px;
+    font-size: 12px;
     background: #fff;
     font-weight: 600;
   }
 
   label {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     display: block;
   }
 
   input, select {
     width: 100%;
-    padding: 10px;
-    border-radius: 10px;
+    padding: 8px;
+    border-radius: 8px;
     border: 1px solid var(--border);
-    font-size: 15px;
+    font-size: 13px;
   }
 
   .btn {
     width: 100%;
-    padding: 12px;
+    padding: 10px;
     background: var(--primary);
     color: #fff;
     border: none;
-    border-radius: 10px;
-    font-size: 15px;
+    border-radius: 8px;
+    font-size: 14px;
     font-weight: 600;
-    margin-top: 10px;
+    margin-top: 8px;
     cursor: pointer;
   }
 
-  /* Team Row Styling for Start / Finish Times */
+  /* Team Card Compact Styling */
   .team-card {
     background: #f8fafc;
     border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px;
-    margin-bottom: 10px;
+    border-radius: 8px;
+    padding: 8px;
+    margin-bottom: 8px;
   }
 
   .team-header {
     display: flex;
-    gap: 8px;
-    margin-bottom: 8px;
+    gap: 6px;
+    margin-bottom: 6px;
   }
 
   .team-times {
     display: grid;
-    grid-template-columns: 1fr 1fr 1.2fr;
-    gap: 6px;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 4px;
     align-items: center;
   }
 
@@ -252,37 +258,77 @@
   }
 
   .team-times label {
-    font-size: 10px;
+    font-size: 9px;
     color: var(--muted);
-    margin-bottom: 2px;
+    margin-bottom: 1px;
   }
 
   .team-times input {
-    padding: 6px;
-    font-size: 13px;
+    padding: 4px;
+    font-size: 12px;
     text-align: center;
   }
 
   .calculated-hours {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
     color: var(--primary);
   }
 
   .break-note {
-    font-size: 10px;
+    font-size: 9px;
     color: var(--muted);
-    margin-top: 2px;
+  }
+
+  /* Condensed Team Member Tasks Grid */
+  .member-tasks-title {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin: 6px 0 4px 0;
+  }
+
+  .member-tasks-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .member-task-pill {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border: 1px solid var(--border);
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: 10px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .member-task-pill.active {
+    background: #e6f4ea;
+    border-color: var(--primary);
+    color: var(--primary);
+    font-weight: 600;
+  }
+
+  .member-task-pill input {
+    width: auto;
+    margin: 0 4px 0 0;
+    accent-color: var(--primary);
   }
 
   .btn-remove {
     background: var(--danger);
     color: #fff;
     border: none;
-    border-radius: 8px;
-    padding: 8px 12px;
+    border-radius: 6px;
+    padding: 4px 8px;
     cursor: pointer;
     font-weight: 600;
+    font-size: 12px;
   }
 
   .nav {
@@ -294,12 +340,12 @@
     border-top: 1px solid var(--border);
     display: flex;
     justify-content: space-around;
-    padding: 10px 0;
+    padding: 8px 0;
   }
 
   .nav-item {
     text-align: center;
-    font-size: 12px;
+    font-size: 11px;
     color: var(--muted);
     cursor: pointer;
   }
@@ -329,16 +375,20 @@
       <div class="summary-box-title">AM Window (05:00 - 13:00)</div>
       <div class="summary-grid">
         <div>
-          <div class="summary-label">Target Hrs</div>
-          <div class="summary-value" id="am_tr">0.0</div>
+          <div class="summary-label">Target</div>
+          <div class="summary-value" id="am_tr">0.0h</div>
         </div>
         <div>
-          <div class="summary-label">Team Hrs</div>
-          <div class="summary-value" id="am_tm">0.0</div>
+          <div class="summary-label">Team</div>
+          <div class="summary-value" id="am_tm">0.0h</div>
         </div>
         <div>
           <div class="summary-label">Variance</div>
-          <div class="summary-value" id="am_vr">0.0</div>
+          <div class="summary-value" id="am_vr">0.0h</div>
+        </div>
+        <div>
+          <div class="summary-label">Est. Finish</div>
+          <div class="summary-value est-time" id="am_est">--:--</div>
         </div>
       </div>
     </div>
@@ -348,16 +398,20 @@
       <div class="summary-box-title">PM Window (13:00 - 21:00)</div>
       <div class="summary-grid">
         <div>
-          <div class="summary-label">Target Hrs</div>
-          <div class="summary-value" id="pm_tr">0.0</div>
+          <div class="summary-label">Target</div>
+          <div class="summary-value" id="pm_tr">0.0h</div>
         </div>
         <div>
-          <div class="summary-label">Team Hrs</div>
-          <div class="summary-value" id="pm_tm">0.0</div>
+          <div class="summary-label">Team</div>
+          <div class="summary-value" id="pm_tm">0.0h</div>
         </div>
         <div>
           <div class="summary-label">Variance</div>
-          <div class="summary-value" id="pm_vr">0.0</div>
+          <div class="summary-value" id="pm_vr">0.0h</div>
+        </div>
+        <div>
+          <div class="summary-label">Est. Finish</div>
+          <div class="summary-value est-time" id="pm_est">--:--</div>
         </div>
       </div>
     </div>
@@ -365,25 +419,25 @@
     <!-- TOTAL SUMMARY -->
     <div class="summary-box" style="background: #e6f4ea; border: 1px solid var(--primary);">
       <div class="summary-box-title" style="color: var(--primary);">Daily Total (Net Paid)</div>
-      <div class="summary-grid">
+      <div class="summary-grid" style="grid-template-columns: 1fr 1fr 1fr;">
         <div>
           <div class="summary-label">Total Cartons</div>
           <div class="summary-value" id="tc">0</div>
         </div>
         <div>
           <div class="summary-label">Total Target</div>
-          <div class="summary-value" id="tr">0.0</div>
+          <div class="summary-value" id="tr">0.0h</div>
         </div>
         <div>
           <div class="summary-label">Total Variance</div>
-          <div class="summary-value" id="vr">0.0</div>
+          <div class="summary-value" id="vr">0.0h</div>
         </div>
       </div>
     </div>
 
   </div>
 
-  <!-- TASKS SECTION -->
+  <!-- CONDENSED TASKS SECTION -->
   <div class="card">
     <div class="section-title">Daily Task Allocations</div>
     
@@ -394,58 +448,76 @@
         <input type="checkbox" id="task_gap" class="task-checkbox" onchange="toggleTaskStyle('task_gap', 'item_task_gap'); calc();">
         <div class="task-info">
           <div class="task-title">Gap Scan</div>
-          <div class="task-meta">Time Window: AM Window</div>
+          <div class="task-meta">AM Window</div>
         </div>
-        <div class="task-hours">1.0 hr</div>
+        <div class="task-hours">1.0h</div>
       </label>
 
       <label class="task-item" id="item_task_double_beep">
         <input type="checkbox" id="task_double_beep" class="task-checkbox" onchange="toggleTaskStyle('task_double_beep', 'item_task_double_beep'); calc();">
         <div class="task-info">
           <div class="task-title">Double Beep</div>
-          <div class="task-meta">Time Window: AM Window</div>
+          <div class="task-meta">AM Window</div>
         </div>
-        <div class="task-hours">0.5 hrs</div>
+        <div class="task-hours">0.5h</div>
       </label>
 
       <label class="task-item" id="item_task_lno">
         <input type="checkbox" id="task_lno" class="task-checkbox" onchange="toggleTaskStyle('task_lno', 'item_task_lno'); calc();">
         <div class="task-info">
           <div class="task-title">LNO</div>
-          <div class="task-meta">Time Window: AM Window</div>
+          <div class="task-meta">AM Window</div>
         </div>
-        <div class="task-hours">1.0 hr</div>
+        <div class="task-hours">1.0h</div>
+      </label>
+
+      <label class="task-item" id="item_task_huddle">
+        <input type="checkbox" id="task_huddle" class="task-checkbox" onchange="toggleTaskStyle('task_huddle', 'item_task_huddle'); calc();">
+        <div class="task-info">
+          <div class="task-title">Daily Huddle</div>
+          <div class="task-meta">09:00 AM</div>
+        </div>
+        <div class="task-hours">0.5h</div>
       </label>
     </div>
 
     <!-- PM TASKS -->
-    <div class="task-group-title" style="margin-top: 16px;">PM Window Tasks</div>
+    <div class="task-group-title" style="margin-top: 10px;">PM Window Tasks</div>
     <div class="task-list">
       <label class="task-item" id="item_task_ooc">
         <input type="checkbox" id="task_ooc" class="task-checkbox" onchange="toggleTaskStyle('task_ooc', 'item_task_ooc'); calc();">
         <div class="task-info">
           <div class="task-title">Out Of Code</div>
-          <div class="task-meta">Time Window: 13:00 - 15:00</div>
+          <div class="task-meta">13:00 - 15:00</div>
         </div>
-        <div class="task-hours">2.0 hrs</div>
+        <div class="task-hours">2.0h</div>
       </label>
 
       <label class="task-item" id="item_task_rotation">
         <input type="checkbox" id="task_rotation" class="task-checkbox" onchange="toggleTaskStyle('task_rotation', 'item_task_rotation'); calc();">
         <div class="task-info">
           <div class="task-title">Rotation Check</div>
-          <div class="task-meta">Time Window: 13:00 - 16:00</div>
+          <div class="task-meta">13:00 - 16:00</div>
         </div>
-        <div class="task-hours">3.0 hrs</div>
+        <div class="task-hours">3.0h</div>
       </label>
 
       <label class="task-item" id="item_task_ready">
         <input type="checkbox" id="task_ready" class="task-checkbox" onchange="toggleTaskStyle('task_ready', 'item_task_ready'); calc();">
         <div class="task-info">
           <div class="task-title">Ready to Fill</div>
-          <div class="task-meta">Time Window: PM Window</div>
+          <div class="task-meta">PM Window</div>
         </div>
-        <div class="task-hours">0.5 hrs</div>
+        <div class="task-hours">0.5h</div>
+      </label>
+
+      <label class="task-item" id="item_task_managers">
+        <input type="checkbox" id="task_managers" class="task-checkbox" onchange="toggleTaskStyle('task_managers', 'item_task_managers'); calc();">
+        <div class="task-info">
+          <div class="task-title">Managers Mtg</div>
+          <div class="task-meta">14:00 - 16:00</div>
+        </div>
+        <div class="task-hours">2.0h</div>
       </label>
     </div>
   </div>
@@ -507,6 +579,14 @@ function toggleTaskStyle(checkboxId, containerId) {
     } else {
       container.classList.remove('active');
     }
+  }
+}
+
+function toggleMemberTaskPill(pill, checkbox) {
+  if (checkbox.checked) {
+    pill.classList.add('active');
+  } else {
+    pill.classList.remove('active');
   }
 }
 
@@ -595,17 +675,44 @@ function addTeam(){
       </div>
       <div class="team-times">
         <div>
-          <label>Start Time</label>
+          <label>Start</label>
           <input type="time" class="t-start" value="06:00" onchange="calc()">
         </div>
         <div>
-          <label>Finish Time</label>
+          <label>Finish</label>
           <input type="time" class="t-end" value="14:00" onchange="calc()">
         </div>
         <div>
           <div class="calculated-hours"><span class="t-hrs">7.5</span>h</div>
           <div class="break-note"><span class="t-break">-0.5h break</span></div>
         </div>
+      </div>
+      <div class="member-tasks-title">Assigned Tasks</div>
+      <div class="member-tasks-grid">
+        <label class="member-task-pill" onclick="toggleMemberTaskPill(this, this.querySelector('input'))">
+          <input type="checkbox" onchange="calc()">Gap Scan
+        </label>
+        <label class="member-task-pill" onclick="toggleMemberTaskPill(this, this.querySelector('input'))">
+          <input type="checkbox" onchange="calc()">Dbl Beep
+        </label>
+        <label class="member-task-pill" onclick="toggleMemberTaskPill(this, this.querySelector('input'))">
+          <input type="checkbox" onchange="calc()">LNO
+        </label>
+        <label class="member-task-pill" onclick="toggleMemberTaskPill(this, this.querySelector('input'))">
+          <input type="checkbox" onchange="calc()">Huddle
+        </label>
+        <label class="member-task-pill" onclick="toggleMemberTaskPill(this, this.querySelector('input'))">
+          <input type="checkbox" onchange="calc()">OOC
+        </label>
+        <label class="member-task-pill" onclick="toggleMemberTaskPill(this, this.querySelector('input'))">
+          <input type="checkbox" onchange="calc()">Rotation
+        </label>
+        <label class="member-task-pill" onclick="toggleMemberTaskPill(this, this.querySelector('input'))">
+          <input type="checkbox" onchange="calc()">Ready Fill
+        </label>
+        <label class="member-task-pill" onclick="toggleMemberTaskPill(this, this.querySelector('input'))">
+          <input type="checkbox" onchange="calc()">Managers
+        </label>
       </div>
     </div>`;
   document.getElementById('team').insertAdjacentHTML('beforeend', row);
@@ -616,6 +723,18 @@ function removeTeam(id){
   let el = document.getElementById('t_' + id);
   if (el) el.remove();
   calc();
+}
+
+/* Helper to convert decimal hours into HH:MM string format */
+function formatTime(decimalHours) {
+  if (isNaN(decimalHours) || decimalHours < 0) return "--:--";
+  let hours = Math.floor(decimalHours) % 24;
+  let minutes = Math.round((decimalHours - Math.floor(decimalHours)) * 60);
+  if (minutes === 60) {
+    hours = (hours + 1) % 24;
+    minutes = 0;
+  }
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 }
 
 /* Calculate overlapping hours between shift interval and window interval */
@@ -655,23 +774,29 @@ function calc(){
   let taskGap = document.getElementById('task_gap');
   let taskDoubleBeep = document.getElementById('task_double_beep');
   let taskLno = document.getElementById('task_lno');
+  let taskHuddle = document.getElementById('task_huddle');
 
   if (taskGap && taskGap.checked) amReqHours += 1.0;
   if (taskDoubleBeep && taskDoubleBeep.checked) amReqHours += 0.5;
   if (taskLno && taskLno.checked) amReqHours += 1.0;
+  if (taskHuddle && taskHuddle.checked) amReqHours += 0.5;
 
   // PM Tasks
   let taskOoc = document.getElementById('task_ooc');
   let taskRotation = document.getElementById('task_rotation');
   let taskReady = document.getElementById('task_ready');
+  let taskManagers = document.getElementById('task_managers');
 
   if (taskOoc && taskOoc.checked) pmReqHours += 2.0;
   if (taskRotation && taskRotation.checked) pmReqHours += 3.0;
   if (taskReady && taskReady.checked) pmReqHours += 0.5;
+  if (taskManagers && taskManagers.checked) pmReqHours += 2.0;
 
   // 3. Calculate Team Hours per window based on start/finish times & Woolworths EA breaks
   let amTeamHours = 0;
   let pmTeamHours = 0;
+  let activeAMHeadcount = 0;
+  let activePMHeadcount = 0;
 
   document.querySelectorAll('.team-card').forEach(card => {
     let startVal = card.querySelector('.t-start').value;
@@ -701,6 +826,9 @@ function calc(){
       let amGrossOverlap = getOverlapHours(shiftStart, shiftEnd, AM_WINDOW_START, AM_WINDOW_END);
       let pmGrossOverlap = getOverlapHours(shiftStart, shiftEnd, PM_WINDOW_START, PM_WINDOW_END);
 
+      if (amGrossOverlap > 0) activeAMHeadcount++;
+      if (pmGrossOverlap > 0) activePMHeadcount++;
+
       // Deduct break proportionally across windows if shift spans both windows
       if (grossShiftHours > 0) {
         let amRatio = amGrossOverlap / grossShiftHours;
@@ -712,27 +840,42 @@ function calc(){
     }
   });
 
-  // Variances
+  // 4. Calculate Variances
   let amVariance = amTeamHours - amReqHours;
   let pmVariance = pmTeamHours - pmReqHours;
   let totalReq = amReqHours + pmReqHours;
   let totalTeam = amTeamHours + pmTeamHours;
   let totalVariance = totalTeam - totalReq;
 
+  // 5. Estimate Completion Times
+  let amEstTime = "--:--";
+  if (activeAMHeadcount > 0) {
+    let amCompletionHour = AM_WINDOW_START + (amReqHours / activeAMHeadcount);
+    amEstTime = formatTime(amCompletionHour);
+  }
+
+  let pmEstTime = "--:--";
+  if (activePMHeadcount > 0) {
+    let pmCompletionHour = PM_WINDOW_START + (pmReqHours / activePMHeadcount);
+    pmEstTime = formatTime(pmCompletionHour);
+  }
+
   // Update AM UI
-  document.getElementById('am_tr').innerText = amReqHours.toFixed(1);
-  document.getElementById('am_tm').innerText = amTeamHours.toFixed(1);
-  document.getElementById('am_vr').innerText = amVariance.toFixed(1);
+  document.getElementById('am_tr').innerText = amReqHours.toFixed(1) + 'h';
+  document.getElementById('am_tm').innerText = amTeamHours.toFixed(1) + 'h';
+  document.getElementById('am_vr').innerText = amVariance.toFixed(1) + 'h';
+  document.getElementById('am_est').innerText = amEstTime;
 
   // Update PM UI
-  document.getElementById('pm_tr').innerText = pmReqHours.toFixed(1);
-  document.getElementById('pm_tm').innerText = pmTeamHours.toFixed(1);
-  document.getElementById('pm_vr').innerText = pmVariance.toFixed(1);
+  document.getElementById('pm_tr').innerText = pmReqHours.toFixed(1) + 'h';
+  document.getElementById('pm_tm').innerText = pmTeamHours.toFixed(1) + 'h';
+  document.getElementById('pm_vr').innerText = pmVariance.toFixed(1) + 'h';
+  document.getElementById('pm_est').innerText = pmEstTime;
 
   // Update Total UI
   document.getElementById('tc').innerText = totalCartons;
-  document.getElementById('tr').innerText = totalReq.toFixed(1);
-  document.getElementById('vr').innerText = totalVariance.toFixed(1);
+  document.getElementById('tr').innerText = totalReq.toFixed(1) + 'h';
+  document.getElementById('vr').innerText = totalVariance.toFixed(1) + 'h';
 }
 
 window.addEventListener('DOMContentLoaded', () => {
